@@ -5,6 +5,7 @@ local Render = {
         self.camera_v_multiplier = 0.2
         self.layers = {}
         self.layers_order = {'Default'}
+        self:addLayer('Default')
     end,
 
     setLayerOrder = function(layers_order)
@@ -17,8 +18,12 @@ local Render = {
         end
     end,
 
+    addLayer = function(self, layer_name)
+        self.layers[layer_name] = {}
+    end,
+
     addToLayer = function(self, layer_name, object)
-        if not self.layers[layer_name] then self.layers[layer_name] = {} end
+        if not self.layers[layer_name] then self:addLayer(layer_name) end
         if self.layers[layer_name] then table.insert(self.layers[layer_name], object) end
     end,
 

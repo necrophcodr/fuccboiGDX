@@ -315,7 +315,6 @@ mm.screen_width, mm.screen_height = love.window.getWidth(), love.window.getHeigh
 mm.init = function()
     love.run = mm.Run
     mm._Collision.generateCategoriesMasks()
-    mm.Rectangle = require (mogamett_path .. '/entities/Rectangle')
 end
 
 -- world
@@ -338,12 +337,6 @@ end
 
 mm.draw = function()
     mm.world:draw()
-end
-
--- magic
-mm.makePlatformer = function()
-    local platformer = require (mogamett_path .. '/game-templates/platformer/platformer')
-    platformer.init(mm)
 end
 
 return mm
