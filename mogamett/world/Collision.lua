@@ -29,8 +29,8 @@ local Collision = {
 
     isSensor = function(type1, type2)
         local collision_ignores = {}
-        for class_name, class in pairs(self.mg.classes) do
-            collision_ignores[class_name] = class.static.ignores or {}
+        for class_name, class in pairs(self.mm.classes) do
+            collision_ignores[class_name] = class.ignores or {}
         end
         local all = {}
         for class_name, _ in pairs(collision_ignores) do

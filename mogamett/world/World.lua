@@ -17,9 +17,9 @@ World:include(CameraShake)
 World:include(HitFrameStop)
 World:include(Particle)
 
-function World:init(mg)
-    self.mg = mg
-    self.id = self.mg.getUID()
+function World:init(mm)
+    self.mm = mm
+    self.id = self.mm.getUID()
     self:collisionInit()
     self:renderInit()
     self:factoryInit()
@@ -34,8 +34,8 @@ function World:init(mg)
     self.entities = {}
     self.stopped = false
 
-    for class_name, _ in pairs(self.mg.classes) do self:addGroup(class_name) end
-    local collision_table = self.mg._Collision.getCollisionCallbacksTable()
+    for class_name, _ in pairs(self.mm.classes) do self:addGroup(class_name) end
+    local collision_table = self.mm._Collision.getCollisionCallbacksTable()
     for class_name, collision_list in pairs(collision_table) do
         for _, collision_info in ipairs(collision_list) do
             if collision_info.type == 'enter' then 
@@ -89,6 +89,15 @@ end
 
 function World:addGroup(group_name)
     table.insert(self.groups, Group(self, group_name))
+end
+
+function World:addToGroup(group_name, entity)
+    for _, group in ipairs(self.groups) do
+        if group.name == group_name then
+            group:add(entity)
+            return
+        end
+    end
 end
 
 function World:getEntityByName(name)

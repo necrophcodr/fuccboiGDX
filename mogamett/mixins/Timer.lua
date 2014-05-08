@@ -1,6 +1,6 @@
 local Timer = {
     timerInit = function(self)
-        self.timer = self.world.mg.Timer.new() 
+        self.timer = self.world.mm.Timer.new() 
         self._timer_tags = {}
     end,
     

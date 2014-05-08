@@ -28,7 +28,7 @@ function Group:add(entity)
 end
 
 function Group:remove(id)
-    table.remove(self.entities, self.world.mg.utils.findIndexByID(self.entities, id))
+    table.remove(self.entities, self.world.mm.utils.findIndexByID(self.entities, id))
 end
 
 function Group:removePostWorldStep()

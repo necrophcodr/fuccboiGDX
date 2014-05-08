@@ -3,11 +3,11 @@ local Factory = {
         self.to_be_created = {}
     end,
 
-    create = function(self, type, x, y, settings)
+    createEntity = function(self, type, x, y, settings)
         table.insert(self.to_be_created, {type = type, x = x, y = y, settings = settings})
     end,
 
-    createImmediate = function(self, type, x, y, settings)
+    createEntityImmediate = function(self, type, x, y, settings)
         local entity = classes[o.type](self, o.x, o.y, o.settings)
         self:addToGroup(o.type, entity)
         return entity 
@@ -16,10 +16,10 @@ local Factory = {
     createPostWorldStep = function(self)
         for _, o in ipairs(self.to_be_created) do
             local entity = nil
-            if o.type then entity = self.mg.classes[o.type](self, o.x, o.y, o.settings) end
+            if o.type then entity = self.mm.classes[o.type](self, o.x, o.y, o.settings) end
             if entity then
                 self:addToGroup(o.type, entity)
-                self:addToLayer(self.mg.classes.static.layer or 'Default', entity)
+                self:addToLayer(self.mm.classes.layer or 'Default', entity)
             end
         end
         self.to_be_created = {}

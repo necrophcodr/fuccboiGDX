@@ -1,35 +1,35 @@
 mogamett_path = string.sub(..., 1, -10)
 
-local mg = {}
+local mm = {}
 
 -- hump
-mg.Timer = require (mogamett_path .. '/libraries/hump/timer')
-mg.Camera = require (mogamett_path .. '/libraries/hump/camera')
-mg.Vector = require (mogamett_path .. '/libraries/hump/vector')
+mm.Timer = require (mogamett_path .. '/libraries/hump/timer')
+mm.Camera = require (mogamett_path .. '/libraries/hump/camera')
+mm.Vector = require (mogamett_path .. '/libraries/hump/vector')
 
 -- middleclass 
-mg._class = require (mogamett_path .. '/libraries/middleclass/middleclass')
--- holds all classes created with the mg.Class call
-mg.classes = {}
-mg.Class = function(class_name, ...)
-    mg.classes[class_name] = mg._class(class_name, ...)
-    return mg.classes[class_name]
+mm._class = require (mogamett_path .. '/libraries/middleclass/middleclass')
+-- holds all classes created with the mm.Class call
+mm.classes = {}
+mm.class = function(class_name, ...)
+    mm.classes[class_name] = mm._class(class_name, ...)
+    return mm.classes[class_name]
 end
 
 -- lovebird
-mg.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
+mm.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
 
 -- utils
-mg.utils = {}
+mm.utils = {}
 -- graphics
-mg.utils.graphics = {}
-mg.utils.graphics.pushRotate = function(x, y, angle)
+mm.utils.graphics = {}
+mm.utils.graphics.pushRotate = function(x, y, angle)
     love.graphics.push()
     love.graphics.translate(x, y)
     love.graphics.rotate(angle or 0)
     love.graphics.translate(-x, -y)
 end
-mg.utils.graphics.pushRotateScale = function(x, y, angle, scale_x, scale_y)
+mm.utils.graphics.pushRotateScale = function(x, y, angle, scale_x, scale_y)
     love.graphics.push()
     love.graphics.translate(x, y)
     love.graphics.rotate(angle or 0)
@@ -37,43 +37,43 @@ mg.utils.graphics.pushRotateScale = function(x, y, angle, scale_x, scale_y)
     love.graphics.translate(-x, -y)
 end
 -- logic
-mg.utils.logic = {}
-mg.utils.logic.equalsAny = function(v, values)
+mm.utils.logic = {}
+mm.utils.logic.equalsAny = function(v, values)
     for _, value in ipairs(values) do
         if value == v then return true end
     end
     return false
 end
-mg.utils.logic.equalsAll = function(v, values)
+mm.utils.logic.equalsAll = function(v, values)
     for _, value in ipairs(values) do
         if value ~= v then return false end
     end
     return true
 end
 -- table
-mg.utils.table = {}
-mg.utils.table.toString = function(t)
+mm.utils.table = {}
+mm.utils.table.toString = function(t)
     local str = "{"
     for k, v in pairs(t) do
         if type(k) ~= "number" then str = str .. k .. " = " end
         if type(v) == "number" or type(v) == "boolean" then str = str .. tostring(v) .. ", "
         elseif type(v) == "string" then str = str .. "'" .. v .. "'" .. ", "
-        elseif type(v) == "table" then str = str .. mg.utils.table.toString(v) .. ", " end
+        elseif type(v) == "table" then str = str .. mm.utils.table.toString(v) .. ", " end
     end
     if #table > 0 then str = string.sub(str, 1, -3) end
     str = str .. "}"
     return str
 end
-mg.utils.table.random = function(t)
+mm.utils.table.random = function(t)
     return t[math.random(1, #t)]
 end
-mg.utils.table.contains = function(t, value)
+mm.utils.table.contains = function(t, value)
     for k, v in pairs(t) do
         if v == value then return true end
     end
     return false
 end
-mg.utils.table.copy = function(t)
+mm.utils.table.copy = function(t)
     local copy
     if type(t) == 'table' then
         copy = {}
@@ -85,22 +85,22 @@ mg.utils.table.copy = function(t)
     return copy
 end
 -- math
-mg.utils.math = {}
-mg.utils.math.isBetween = function(v, min, max)
+mm.utils.math = {}
+mm.utils.math.isBetween = function(v, min, max)
     return v >= min and v <= max
 end
-mg.utils.math.clamp = function(v, min, max)
+mm.utils.math.clamp = function(v, min, max)
     return v < min and min or (v > max and max or v)
 end
-mg.utils.math.random = function(min, max)
+mm.utils.math.random = function(min, max)
     return math.random()*max+min
 end
-mg.utils.math.round = function(n, p)
+mm.utils.math.round = function(n, p)
     local m = math.power(10, p or 0)
     return math.floor(n*m+0.5)/m
 end
 -- misc
-mg.utils.chooseWithProbability = function(choices, chances)
+mm.utils.chooseWithProbability = function(choices, chances)
     local r = math.random(1, 1000)
     local intervals = {}
     -- Creates a table with appropriate intervals: 
@@ -122,7 +122,7 @@ mg.utils.chooseWithProbability = function(choices, chances)
         end
     end
 end
-mg.utils.angleToDirection4 = function(angle)
+mm.utils.angleToDirection4 = function(angle)
     local pi = math.pi
     if angle >= pi/4 then angle = -2*pi+angle end
     if angle <     pi/4 and angle >=  -1*pi/4 then return 'right' end
@@ -130,13 +130,13 @@ mg.utils.angleToDirection4 = function(angle)
     if angle <  -3*pi/4 and angle >=  -5*pi/4 then return 'left' end
     if angle <  -5*pi/4 and angle >=  -7*pi/4 then return 'down' end
 end
-mg.utils.directionToAngle4 = function(direction)
+mm.utils.directionToAngle4 = function(direction)
     if direction == 'right' then return 0 end
     if direction == 'up' then return -math.pi/2 end
     if direction == 'left' then return math.pi end
     if direction == 'down' then return math.pi/2 end
 end
-mg.utils.findIndexById = function(t, id)
+mm.utils.findIndexById = function(t, id)
     for i, object in ipairs(t) do
         if object.id == id then 
             return i 
@@ -145,31 +145,31 @@ mg.utils.findIndexById = function(t, id)
 end
 
 -- collision, holds global collision data (mostly who should ignore who and callback settings)
-mg._Collision = {}
-mg._Collision.masks = {}
-mg._Collision.getCollisionCallbacksTable = function()
+mm._Collision = {}
+mm._Collision.masks = {}
+mm._Collision.getCollisionCallbacksTable = function()
     local collision_table = {}
-    for class_name, class in pairs(mg.classes) do
+    for class_name, class in pairs(mm.classes) do
         collision_table[class_name] = {}
-        for _, v in ipairs(class.static.enter) do
+        for _, v in ipairs(class.contact_enter) do
             table.insert(collision_table[class_name], {type = 'enter', other = v})
         end
-        for _, v in ipairs(class.static.exit) do
+        for _, v in ipairs(class.contact_exit) do
             table.insert(collision_table[class_name], {type = 'exit', other = v})
         end
-        for _, v in ipairs(class.static.pre) do
+        for _, v in ipairs(class.pre_solve) do
             table.insert(collision_table[class_name], {type = 'pre', other = v})
         end
-        for _, v in ipairs(class.static.post) do
+        for _, v in ipairs(class.post_solve) do
             table.insert(collision_table[class_name], {type = 'post', other = v})
         end
     end
     return collision_table
 end
-mg._Collision.generateCategoriesMasks = function()
+mm._Collision.generateCategoriesMasks = function()
     local collision_ignores = {}
-    for class_name, class in pairs(mg.classes) do
-        collision_ignores[class_name] = class.static.ignores or {}
+    for class_name, class in pairs(mm.classes) do
+        collision_ignores[class_name] = class.ignores or {}
     end
     local incoming = {}
     local expanded = {}
@@ -240,12 +240,12 @@ mg._Collision.generateCategoriesMasks = function()
         for _, c in ipairs(v) do
             table.insert(current_masks, categories[c])
         end
-        mg._Collision.masks[k] = {categories = category, masks = current_masks}
+        mm._Collision.masks[k] = {categories = category, masks = current_masks}
     end
 end
 
 -- run, overwrites LÖVE's default run function
-mg.Run = function()
+mm.Run = function()
     math.randomseed(os.time())
     math.random() math.random()
 
@@ -297,31 +297,39 @@ mg.Run = function()
 end
 
 -- global
-mg.debug_draw = true
-mg.path = nil
-mg.lovebird_enabled = true
-mg.uid = 0
-mg.getUID = function()
-    mg.uid = mg.uid + 1
-    return mg.uid
+mm.debug_draw = true
+mm.path = nil
+mm.lovebird_enabled = true
+mm.uid = 0
+mm.screen_width, mm.screen_height = love.window.getWidth(), love.window.getHeight()
+
+mm.getUID = function()
+    mm.uid = mm.uid + 1
+    return mm.uid
 end
 
 -- init
-mg.init = function()
-    love.run = mg.Run
-    mg._Collision.generateCategoriesMasks()
+mm.init = function(name)
+    love.run = mm.Run
+    mm._Collision.generateCategoriesMasks()
+    mogamett_name = name
+    mm.Rectangle = require (mogamett_path .. '/entities/Rectangle')
 end
 
 -- world
-mg.World = require (mogamett_path .. '/world/World')
-mg.world = mg.World(mg)
+mm.World = require (mogamett_path .. '/world/World')
+mm.world = mm.World(mm)
 
 -- entity
-mg.Entity = require (mogamett_path .. '/entities/Entity')
+mm.Entity = require (mogamett_path .. '/entities/Entity')
 
-mg.update = function(dt)
-    if mg.lovebird_enabled then mg.lovebird.update() end
-    mg.world:update(dt)
+mm.update = function(dt)
+    if mm.lovebird_enabled then mm.lovebird.update() end
+    mm.world:update(dt)
 end
 
-return mg
+mm.draw = function()
+    mm.world:draw()
+end
+
+return mm
