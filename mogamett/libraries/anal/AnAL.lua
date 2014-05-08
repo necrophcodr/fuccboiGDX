@@ -198,5 +198,5 @@ if Animations_legacy_support then
 	end
 end
 
-setmetatable(animation, {__ = function(_, ...) return animation.new(...) end})
+setmetatable(animation, {__call = function(_, ...) return animation.new(...) end})
 return animation

@@ -154,16 +154,20 @@ mm._Collision.getCollisionCallbacksTable = function()
     local collision_table = {}
     for class_name, class in pairs(mm.classes) do
         collision_table[class_name] = {}
-        for _, v in ipairs(class.contact_enter) do
+        local class_contact_enter = class.contact_enter or {}
+        for _, v in ipairs(class_contact_enter) do
             table.insert(collision_table[class_name], {type = 'enter', other = v})
         end
-        for _, v in ipairs(class.contact_exit) do
+        local class_contact_exit = class.contact_exit or {}
+        for _, v in ipairs(class_contact_exit) do
             table.insert(collision_table[class_name], {type = 'exit', other = v})
         end
-        for _, v in ipairs(class.pre_solve) do
+        local class_pre_solve = class.pre_solve or {}
+        for _, v in ipairs(class_pre_solve) do
             table.insert(collision_table[class_name], {type = 'pre', other = v})
         end
-        for _, v in ipairs(class.post_solve) do
+        local class_post_solve = class.post_solve or {}
+        for _, v in ipairs(class_post_solve) do
             table.insert(collision_table[class_name], {type = 'post', other = v})
         end
     end
@@ -307,27 +311,26 @@ end
 
 mm.uid = 0
 mm.path = nil
+mm.zoom = 1
 mm.debug_draw = true
-mm.lovebird_enabled = true
-mm.screen_width, mm.screen_height = love.window.getWidth(), love.window.getHeight()
+mm.lovebird_enabled = false
+mm.screen_width = love.window.getWidth()
+mm.screen_height = love.window.getHeight()
 
 -- init
 mm.init = function()
+    love.graphics.setDefaultFilter('nearest', 'nearest')
     love.run = mm.Run
+    mm.world = mm.World(mm)
     mm._Collision.generateCategoriesMasks()
 end
 
 -- world
 mm.World = require (mogamett_path .. '/world/World')
-mm.world = mm.World(mm)
 
 -- entity
 mm.Entity = require (mogamett_path .. '/entities/Entity')
-
--- mixins
-mm.mixin = {}
-mm.mixin.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
-mm.mixin.Timer = require (mogamett_path .. '/mixins/Timer')
+mm.Body = require (mogamett_path .. '/entities/Body')
 
 mm.update = function(dt)
     if mm.lovebird_enabled then mm.lovebird.update() end

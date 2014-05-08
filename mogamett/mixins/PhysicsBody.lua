@@ -20,6 +20,7 @@ local PhysicsBody = {
         elseif self.shape_name == 'Chain' then
             self.shape = love.physics.newChainShape(settings.loop or false, unpack(settings.vertices))
         elseif self.shape_name == 'Circle' then
+            self.r = settings.r or 16
             self.w, self.h = settings.r or 32, settings.r or 32
             self.shape = love.physics.newCircleShape(settings.r or 16)
         end

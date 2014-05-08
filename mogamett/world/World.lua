@@ -34,7 +34,7 @@ function World:init(mm)
     self.entities = {}
     self.stopped = false
 
-    for class_name, _ in pairs(self.mm.classes) do self:addGroup(class_name) end
+    for class_name, _ in pairs(self.mm.classes) do print(class_name); self:addGroup(class_name) end
     local collision_table = self.mm._Collision.getCollisionCallbacksTable()
     for class_name, collision_list in pairs(collision_table) do
         for _, collision_info in ipairs(collision_list) do

@@ -1,6 +1,7 @@
 local Render = {
     renderInit = function(self)
         self.camera = self.mm.Camera()
+        self.camera_zoom = 1
         self.camera_v = self.mm.Vector(0, 0)
         self.camera_v_multiplier = 0.2
         self.layers = {}
@@ -41,6 +42,8 @@ local Render = {
                 if self.layers[layer_name][i].dead then table.remove(self.layers[layer_name], i) end
             end
         end
+
+        self.camera:zoomTo(mg.zoom)
     end,
 
     renderAttach = function(self)
