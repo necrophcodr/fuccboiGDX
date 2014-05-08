@@ -1,11 +1,11 @@
 local Particle = {
     particleInit = function(self)
-        self.image = love.graphics.newImage('resources/particles/sperm/square.png')
+        self.image = love.graphics.newImage(mogamett_path .. '/resources/particles/sperm/square.png')
         self.particle_systems = {}
         self.template_particle_systems = {}
         self.to_be_removed = {}
 
-        local sperm_files = love.filesystem.getDirectoryItems('resources/particles/sperm')
+        local sperm_files = love.filesystem.getDirectoryItems(mogamett_path .. '/resources/particles/sperm')
         local names = {}
         for _, file in ipairs(sperm_files) do
             if file ~= 'main.lua' and file ~= 'conf.lua' and string.sub(file, -3) ~= 'png' and string.sub(file, -3) == 'lua' then
@@ -98,7 +98,7 @@ local Particle = {
     end,
 
     _getPS = function(self, name)
-        local ps_data = require('resources/particles/sperm/' .. name)
+        local ps_data = require (mogamett_path .. '/resources/particles/sperm/' .. name)
         local particle_settings = {}
         particle_settings["colors"] = {}
         particle_settings["sizes"] = {}

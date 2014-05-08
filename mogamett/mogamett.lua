@@ -19,9 +19,6 @@ end
 -- lovebird
 mg.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
 
--- entity
-mg.Entity = require (mogamett_path .. '/entities/Entity')
-
 -- utils
 mg.utils = {}
 -- graphics
@@ -138,6 +135,13 @@ mg.utils.directionToAngle4 = function(direction)
     if direction == 'up' then return -math.pi/2 end
     if direction == 'left' then return math.pi end
     if direction == 'down' then return math.pi/2 end
+end
+mg.utils.findIndexById = function(t, id)
+    for i, object in ipairs(t) do
+        if object.id == id then 
+            return i 
+        end
+    end
 end
 
 -- collision, holds global collision data (mostly who should ignore who and callback settings)
@@ -296,9 +300,10 @@ end
 mg.debug_draw = true
 mg.path = nil
 mg.lovebird_enabled = true
+mg.uid = 0
 mg.getUID = function()
-    uid = uid + 1
-    return uid
+    mg.uid = mg.uid + 1
+    return mg.uid
 end
 
 -- init
@@ -307,8 +312,16 @@ mg.init = function()
     mg._Collision.generateCategoriesMasks()
 end
 
+-- world
+mg.World = require (mogamett_path .. '/world/World')
+mg.world = mg.World(mg)
+
+-- entity
+mg.Entity = require (mogamett_path .. '/entities/Entity')
+
 mg.update = function(dt)
     if mg.lovebird_enabled then mg.lovebird.update() end
+    mg.world:update(dt)
 end
 
 return mg

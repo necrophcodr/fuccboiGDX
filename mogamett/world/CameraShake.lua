@@ -1,9 +1,9 @@
 local CameraShake = {
     cameraShakeInit = function(self)
         self.uid = 0
-        self.p = Vector(self.camera:pos())
-        self.v = Vector(0, 0)
-        self.a = Vector(0, 0)
+        self.p = self.mg.Vector(self.camera:pos())
+        self.v = self.mg.Vector(0, 0)
+        self.a = self.mg.Vector(0, 0)
         self.shakes = {}
         self.shake_intensity = 0
         self.max_intensity = 15
@@ -11,7 +11,7 @@ local CameraShake = {
 
     cameraShakeUpdate = function(self, dt)
         self.shake_intensity = 0
-        self.p = Vector(self.camera:pos())
+        self.p = self.mg.Vector(self.camera:pos())
         for _, shake in ipairs(self.shakes) do
             if love.timer.getTime() > shake.creation_time + shake.duration then
                 self:cameraShakeRemove(shake.id)
@@ -29,7 +29,7 @@ local CameraShake = {
         if self.shake_intensity == 0 then self.camera:lookAt(self.p.x, self.p.y) end
         ]]--
 
-        self.v = Vector(math.prandom(-self.shake_intensity, self.shake_intensity), math.prandom(-self.shake_intensity, self.shake_intensity))
+        self.v = self.mg.Vector(self.mg.utils.math.random(-self.shake_intensity, self.shake_intensity), self.mg.utils.math.random(-self.shake_intensity, self.shake_intensity))
         self.camera:move(self.v.x, self.v.y)
         if self.shake_intensity == 0 then self.camera:lookAt(self.p.x, self.p.y) end
     end,
@@ -40,12 +40,12 @@ local CameraShake = {
     end,
 
     cameraShakeAddPos = function(self, x, y, intensity, duration)
-        local d = Vector.distance(Vector(x, y), Vector(self.player.x, self.player.y))
+        local d = self.mg.Vector.distance(Vector(x, y), Vector(self.player.x, self.player.y))
         self:cameraShakeAdd(math.max(intensity - intensity*d/512, 0), duration)
     end,
 
     cameraShakeRemove = function(self, id)
-        table.remove(self.shakes, findIndexByID(self.shakes, id))
+        table.remove(self.shakes, self.mg.utils.findIndexByID(self.shakes, id))
     end
 }
 

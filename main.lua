@@ -3,7 +3,7 @@ function love.load()
     mg.init()
 end
 
-function love.update()
+function love.update(dt)
     mg.update(dt)
 end
 

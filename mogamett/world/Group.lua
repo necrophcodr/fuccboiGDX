@@ -1,7 +1,8 @@
-local class = require (mogamett_path .. 'libraries/middleclass/middleclass')
+local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
 local Group = class('Group')
 
-function Group:init(name)
+function Group:init(world, name)
+    self.world = world
     self.name = name
     self.entities = {}
 end
@@ -27,15 +28,14 @@ function Group:add(entity)
 end
 
 function Group:remove(id)
-    table.remove(self.entities, findIndexByID(self.entities, id))
+    table.remove(self.entities, self.world.mg.utils.findIndexByID(self.entities, id))
 end
 
 function Group:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
             if self.entities[i].class:includes(Timer) then self.entities[i]:timerDestroy() end
-            if self.entities[i].class:includes(PhysicsRectangle) or self.entities[i].class:include(PhysicsCircle) or 
-               self.entities[i].class:include(PhysicsBSGRectangle) or self.entities[i].class:includes(PhysicsPolygon) then
+            if self.entities[i].class:includes(PhysicsBody) then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
                 if self.entities[i].body then self.entities[i].body:destroy() end

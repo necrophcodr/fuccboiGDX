@@ -1,7 +1,7 @@
 local Render = {
     renderInit = function(self)
-        self.camera = Camera()
-        self.camera_v = Vector(0, 0)
+        self.camera = self.mg.Camera()
+        self.camera_v = self.mg.Vector(0, 0)
         self.camera_v_multiplier = 0.2
         self.layers = {}
         self.layers_order = {'Default'}

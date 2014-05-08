@@ -1,13 +1,13 @@
-local Collision = require (mogamett_path .. 'game/world/Collision')
-local Render = require (mogamett_path .. 'game/world/Render')
-local Factory = require (mogamett_path .. 'game/world/Factory')
-local Group = require (mogamett_path .. 'game/world/Group')
-local CameraShake = require (mogamett_path .. 'game/world/CameraShake')
-local HitFrameStop = require (mogamett_path .. 'game/world/HitFrameStop')
-local Query = require (mogamett_path .. 'game/world/Query')
-local Particle = require (mogamett_path .. 'game/world/Particle')
+local Collision = require (mogamett_path .. '/world/Collision')
+local Render = require (mogamett_path .. '/world/Render')
+local Factory = require (mogamett_path .. '/world/Factory')
+local Group = require (mogamett_path .. '/world/Group')
+local CameraShake = require (mogamett_path .. '/world/CameraShake')
+local HitFrameStop = require (mogamett_path .. '/world/HitFrameStop')
+local Query = require (mogamett_path .. '/world/Query')
+local Particle = require (mogamett_path .. '/world/Particle')
 
-local class = require (mogamett_path .. 'libraries/middleclass/middleclass')
+local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
 local World = class('World')
 World:include(Collision)
 World:include(Render)
@@ -19,7 +19,7 @@ World:include(Particle)
 
 function World:init(mg)
     self.mg = mg
-    self.id = getUID()
+    self.id = self.mg.getUID()
     self:collisionInit()
     self:renderInit()
     self:factoryInit()
@@ -34,7 +34,7 @@ function World:init(mg)
     self.entities = {}
     self.stopped = false
 
-    for class_name, _ in pairs(classes) do self:addGroup(class_name) end
+    for class_name, _ in pairs(self.mg.classes) do self:addGroup(class_name) end
     local collision_table = self.mg._Collision.getCollisionCallbacksTable()
     for class_name, collision_list in pairs(collision_table) do
         for _, collision_info in ipairs(collision_list) do
@@ -65,10 +65,8 @@ function World:update(dt)
     self.world:update(dt)
     self:createPostWorldStep()
     self:removePostWorldStep()
-    self:remove()
     for _, group in ipairs(self.groups) do 
         group:removePostWorldStep() 
-        group:actionPostWorldStep()
     end
 end
 
@@ -89,36 +87,8 @@ function World:getAllEntities()
     return entities
 end
 
-function World:getUIDS()
-    local uids = {}
-    for _, group in ipairs(self.groups) do
-        local group_entities = group:getEntities()
-        for _, group_entity in ipairs(group_entities) do
-            table.insert(uids, group_entity.id)
-        end
-    end
-    return uids
-end
-
-function World:add(entity)
-    table.insert(self.entities, entity)
-end
-
-function World:remove(id)
-    table.remove(self.entities, findIndexByID(self.entities, id))
-end
-
 function World:addGroup(group_name)
-    table.insert(self.groups, Group(group_name))
-end
-
-function World:addToGroup(group_name, entity)
-    for _, group in ipairs(self.groups) do
-        if group.name == group_name then
-            group:add(entity)
-            return
-        end
-    end
+    table.insert(self.groups, Group(self, group_name))
 end
 
 function World:getEntityByName(name)
@@ -142,16 +112,6 @@ function World:getEntitiesFromGroup(group_name)
     end
 end
 
-function World:removeGroup(group_name)
-    for i, group in ipairs(self.groups) do
-        if group.name == group_name then
-            group:destroy()
-            table.remove(self.groups, i)
-            return
-        end
-    end
-end
-
 function World:removeFromGroup(group_name, id)
     for _, group in ipairs(self.groups) do
         if group.name == group_name then
@@ -165,8 +125,7 @@ function World:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
             if self.entities[i].class:includes(Timer) then self.entities[i]:timerDestroy() end
-            if self.entities[i].class:includes(PhysicsRectangle) or self.entities[i].class:include(PhysicsCircle) or 
-               self.entities[i].class:include(PhysicsBSGRectangle) or self.entities[i].class:includes(PhysicsPolygon) then
+            if self.entities[i].class:includes(PhysicsBody) then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
                 if self.entities[i].body then self.entities[i].body:destroy() end
@@ -175,7 +134,6 @@ function World:removePostWorldStep()
                 self.entities[i].body = nil
             end
             self.entities[i].world = nil
-            self:remove(self.entities[i].id)
         end
     end
 end
