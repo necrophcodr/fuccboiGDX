@@ -1,5 +1,6 @@
 local PhysicsBody = {
     physicsBodyInit = function(self, world, x, y, settings)
+        settings = settings or {}
         self.body = love.physics.newBody(world, x, y, settings.body_type or 'static')
         self.shape_name = settings.shape or 'Rectangle'
         if self.shape_name == 'BSGRectangle' then

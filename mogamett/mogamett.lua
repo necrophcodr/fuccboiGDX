@@ -12,7 +12,7 @@ mm.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
 
 -- middleclass 
 mm._class = require (mogamett_path .. '/libraries/middleclass/middleclass')
--- holds all classes created with the mm.Class call
+-- holds all classes created with the mm.class call
 mm.classes = {}
 mm.class = function(class_name, ...)
     mm.classes[class_name] = mm._class(class_name, ...)
@@ -325,10 +325,9 @@ mm.world = mm.World(mm)
 mm.Entity = require (mogamett_path .. '/entities/Entity')
 
 -- mixins
-mm.Fader = require (mogamett_path .. '/mixins/Fader')
-mm.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
-mm.Timer = require (mogamett_path .. '/mixins/Timer')
-mm.HittableInvulnerable = require (mogamett_path .. '/mixins/HittableInvulnerable')
+mm.mixin = {}
+mm.mixin.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
+mm.mixin.Timer = require (mogamett_path .. '/mixins/Timer')
 
 mm.update = function(dt)
     if mm.lovebird_enabled then mm.lovebird.update() end
