@@ -7,6 +7,9 @@ mm.Timer = require (mogamett_path .. '/libraries/hump/timer')
 mm.Camera = require (mogamett_path .. '/libraries/hump/camera')
 mm.Vector = require (mogamett_path .. '/libraries/hump/vector')
 
+-- AnAL
+mm.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
+
 -- middleclass 
 mm._class = require (mogamett_path .. '/libraries/middleclass/middleclass')
 -- holds all classes created with the mm.Class call
