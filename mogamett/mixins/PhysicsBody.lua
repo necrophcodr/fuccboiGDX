@@ -54,6 +54,18 @@ local PhysicsBody = {
             end
         end
     end,
+    
+    handleCollisions = function(type, object, contact, ni1, ti1, ni2, ti2)
+        if type == 'pre' then
+            self:preSolve(object, contact)
+        elseif type == 'post' then
+            self:postSolve(object, contact, ni1, ti1, ni2, ti2)
+        elseif type == 'enter' then
+            self:onCollisionEnter(object, contact)
+        elseif type == 'exit' then
+            self:onCollisionExit(object, contact)
+        end
+    end,
 }
 
 return PhysicsBody

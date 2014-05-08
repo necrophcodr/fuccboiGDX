@@ -76,6 +76,10 @@ function World:draw()
     self:renderDetach()
 end
 
+function World:setGravity(x, y)
+    self.world:setGravity(x or 0, y or 0)
+end
+
 function World:getAllEntities()
     local entities = {}
     for _, group in ipairs(self.groups) do

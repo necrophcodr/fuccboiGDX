@@ -94,7 +94,7 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.pre.sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'pre', b, nx, ny, contact)
+                        a[collision.action](a, 'pre', b, contact)
                     end
                 end
             end
@@ -104,14 +104,14 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.pre.non_sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'pre', b, nx, ny, contact, true)
+                        a[collision.action](a, 'pre', b, contact)
                     end
                 end
             end
         end
     end,
 
-    collisionPost = function(fixture_a, fixture_b, contact)
+    collisionPost = function(fixture_a, fixture_b, contact, ni1, ti1, ni2, ti2)
         local a, b = fixture_a:getUserData(), fixture_b:getUserData()
         local nx, ny = contact:getNormal()
 
@@ -120,7 +120,7 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.post.sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'post', b, nx, ny, contact)
+                        a[collision.action](a, 'post', b, contact, ni1, ti1, ni2, ti2)
                     end
                 end
             end
@@ -130,7 +130,7 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.post.non_sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'post', b, nx, ny, contact, true)
+                        a[collision.action](a, 'post', b, contact, ni1, ti1, ni2, ti2)
                     end
                 end
             end
@@ -146,7 +146,7 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.on_enter.sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'enter', b, nx, ny, contact)
+                        a[collision.action](a, 'enter', b, contact)
                     end
                 end
             end
@@ -156,7 +156,7 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.on_enter.non_sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'enter', b, nx, ny, contact, true)
+                        a[collision.action](a, 'enter', b, contact)
                     end
                 end
             end
@@ -172,7 +172,7 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.on_exit.sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'exit', b, nx, ny, contact)
+                        a[collision.action](a, 'exit', b, contact)
                     end
                 end
             end
@@ -182,7 +182,7 @@ local Collision = {
                 for _, collision in ipairs(a.world.collisions.on_exit.non_sensor) do
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
-                        a[collision.action](a, 'exit', b, nx, ny, contact, true)
+                        a[collision.action](a, 'exit', b, contact)
                     end
                 end
             end

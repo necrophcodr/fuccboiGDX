@@ -1,5 +1,4 @@
 local Rectangle = loadstring("local Rectangle = " .. mogamett_name .. ".class('Rectangle', " .. mogamett_name .. ".Entity); return Rectangle")()
--- local Rectangle = mm.class('Rectangle', mm.Entity)
 
 function Rectangle:init(world, x, y, settings)
     local Entity = loadstring('return ' .. mogamett_name .. '.Entity')()
