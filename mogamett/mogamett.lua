@@ -300,22 +300,21 @@ mm.Run = function()
 end
 
 -- global
-mm.debug_draw = true
-mm.path = nil
-mm.lovebird_enabled = true
-mm.uid = 0
-mm.screen_width, mm.screen_height = love.window.getWidth(), love.window.getHeight()
-
 mm.getUID = function()
     mm.uid = mm.uid + 1
     return mm.uid
 end
 
+mm.uid = 0
+mm.path = nil
+mm.debug_draw = true
+mm.lovebird_enabled = true
+mm.screen_width, mm.screen_height = love.window.getWidth(), love.window.getHeight()
+
 -- init
-mm.init = function(name)
+mm.init = function()
     love.run = mm.Run
     mm._Collision.generateCategoriesMasks()
-    mogamett_name = name
     mm.Rectangle = require (mogamett_path .. '/entities/Rectangle')
 end
 
@@ -326,6 +325,12 @@ mm.world = mm.World(mm)
 -- entity
 mm.Entity = require (mogamett_path .. '/entities/Entity')
 
+-- mixins
+mm.Fader = require (mogamett_path .. '/mixins/Fader')
+mm.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
+mm.Timer = require (mogamett_path .. '/mixins/Timer')
+mm.HittableInvulnerable = require (mogamett_path .. '/mixins/HittableInvulnerable')
+
 mm.update = function(dt)
     if mm.lovebird_enabled then mm.lovebird.update() end
     mm.world:update(dt)
@@ -333,6 +338,12 @@ end
 
 mm.draw = function()
     mm.world:draw()
+end
+
+-- magic
+mm.makePlatformer = function()
+    local platformer = require (mogamett_path .. '/game-templates/platformer/platformer')
+    platformer.init(mm)
 end
 
 return mm
