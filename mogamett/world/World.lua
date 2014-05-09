@@ -171,19 +171,39 @@ function World:destroy()
 end
 
 function World:keypressed(key)
-
+    for _, group in ipairs(self.groups) do group:keypressed(key) end
+    for _, entity in ipairs(self.entities) do 
+        if entity.keypressed then
+            entity:keypressed(key) 
+        end
+    end
 end
 
 function World:keyreleased(key)
-
+    for _, group in ipairs(self.groups) do group:keyreleased(key) end
+    for _, entity in ipairs(self.entities) do 
+        if entity.keyreleased then
+            entity:keyreleased(key) 
+        end
+    end
 end
 
 function World:mousepressed(x, y, button)
-
+    for _, group in ipairs(self.groups) do group:mousepressed(x, y, button) end
+    for _, entity in ipairs(self.entities) do 
+        if entity.mousepressed then
+            entity:mousepressed(x, y, button) 
+        end
+    end
 end
 
 function World:mousereleased(x, y, button)
-
+    for _, group in ipairs(self.groups) do group:mousereleased(x, y, button) end
+    for _, entity in ipairs(self.entities) do 
+        if entity.mousereleased then
+            entity:mousereleased(x, y, button) 
+        end
+    end
 end
 
 return World

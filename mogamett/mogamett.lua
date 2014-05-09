@@ -330,7 +330,6 @@ mm.World = require (mogamett_path .. '/world/World')
 
 -- entity
 mm.Entity = require (mogamett_path .. '/entities/Entity')
-mm.Body = require (mogamett_path .. '/entities/Body')
 
 mm.update = function(dt)
     if mm.lovebird_enabled then mm.lovebird.update() end

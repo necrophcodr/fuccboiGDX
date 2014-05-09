@@ -67,4 +67,37 @@ function Group:call(action_name, ...)
     end
 end
 
+function Group:keypressed(key)
+    for _, entity in ipairs(self.entities) do 
+        if entity.keypressed then
+            entity:keypressed(key)
+        end
+    end
+end
+
+function Group:keyreleased(key)
+    for _, entity in ipairs(self.entities) do 
+        if entity.keyreleased then
+            entity:keyreleased(key)
+        end
+    end
+    
+end
+
+function Group:mousepressed(x, y, button)
+    for _, entity in ipairs(self.entities) do 
+        if entity.mousepressed then
+            entity:mousepressed(x, y, button)
+        end
+    end
+end
+
+function Group:mousereleased(x, y, button)
+    for _, entity in ipairs(self.entities) do 
+        if entity.mousereleased then
+            entity:mousereleased(x, y, button)
+        end
+    end
+end
+
 return Group
