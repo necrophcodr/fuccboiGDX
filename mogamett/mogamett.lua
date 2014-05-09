@@ -10,6 +10,9 @@ mm.Vector = require (mogamett_path .. '/libraries/hump/vector')
 -- AnAL
 mm.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
 
+-- struct
+mm.Struct = require (mogamett_path .. '/libraries/struct/struct')
+
 -- middleclass 
 mm._class = require (mogamett_path .. '/libraries/middleclass/middleclass')
 -- holds all classes created with the mm.class call
@@ -21,6 +24,10 @@ end
 
 -- lovebird
 mm.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
+
+-- input
+mm.Input = require (mogamett_path .. '/libraries/mogamett/input')
+mm.input = mm.Input()
 
 -- utils
 mm.utils = {}
@@ -333,6 +340,7 @@ mm.Entity = require (mogamett_path .. '/entities/Entity')
 
 mm.update = function(dt)
     if mm.lovebird_enabled then mm.lovebird.update() end
+    mm.input:update(dt)
     mm.world:update(dt)
 end
 
