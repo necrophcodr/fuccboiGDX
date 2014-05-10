@@ -62,7 +62,7 @@ local PhysicsBody = {
         end
     end,
     
-    handleCollisions = function(type, object, contact, ni1, ti1, ni2, ti2)
+    handleCollisions = function(self, type, object, contact, ni1, ti1, ni2, ti2)
         if type == 'pre' then
             if self.preSolve then
                 self:preSolve(object, contact)

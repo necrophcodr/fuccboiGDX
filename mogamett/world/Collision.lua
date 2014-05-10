@@ -27,7 +27,7 @@ local Collision = {
         self.collisions.post.non_sensor = {}
     end,
 
-    isSensor = function(type1, type2)
+    isSensor = function(self, type1, type2)
         local collision_ignores = {}
         for class_name, class in pairs(self.mm.classes) do
             collision_ignores[class_name] = class.ignores or {}
@@ -53,10 +53,10 @@ local Collision = {
                 end
             end
         end
-        if table.contains(ignored_types, type2) then return true else return false end
+        if self.mm.utils.table.contains(ignored_types, type2) then return true else return false end
     end,
 
-    collIsSensor = function(type1, type2)
+    collIsSensor = function(self, type1, type2)
         if self:isSensor(type1, type2) or self:isSensor(type2, type1) then return true
         else return false end
     end,
@@ -95,6 +95,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'pre', b, contact)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'pre', a, contact) end
                     end
                 end
             end
@@ -105,6 +106,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'pre', b, contact)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'pre', a, contact) end
                     end
                 end
             end
@@ -121,6 +123,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'post', b, contact, ni1, ti1, ni2, ti2)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'post', a, contact, ni1, ti2, ni2, ti2) end
                     end
                 end
             end
@@ -131,6 +134,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'post', b, contact, ni1, ti1, ni2, ti2)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'post', a, contact, ni1, ti2, ni2, ti2) end
                     end
                 end
             end
@@ -147,6 +151,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'enter', b, contact)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'enter', a, contact) end
                     end
                 end
             end
@@ -157,6 +162,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'enter', b, contact)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'enter', a, contact) end
                     end
                 end
             end
@@ -173,6 +179,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'exit', b, contact)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'exit', a, contact) end
                     end
                 end
             end
@@ -183,6 +190,7 @@ local Collision = {
                     if collIf(collision.type1, collision.type2, a, b) then
                         a, b = collEnsure(collision.type1, a, collision.type2, b)
                         a[collision.action](a, 'exit', b, contact)
+                        if collision.type1 == collision.type2 then b[collision.action](b, 'exit', a, contact) end
                     end
                 end
             end

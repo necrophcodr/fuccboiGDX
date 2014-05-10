@@ -87,19 +87,19 @@ function collision:getCollisionCallbacksTable()
     local collision_table = {}
     for class_name, class in pairs(self.mm.classes) do
         collision_table[class_name] = {}
-        local class_contact_enter = class.contact_enter or {}
-        for _, v in ipairs(class_contact_enter) do
+        local class_collision_enter = class.enter or {}
+        for _, v in ipairs(class_collision_enter) do
             table.insert(collision_table[class_name], {type = 'enter', other = v})
         end
-        local class_contact_exit = class.contact_exit or {}
-        for _, v in ipairs(class_contact_exit) do
+        local class_collision_exit = class.exit or {}
+        for _, v in ipairs(class_collision_exit) do
             table.insert(collision_table[class_name], {type = 'exit', other = v})
         end
-        local class_pre_solve = class.pre_solve or {}
+        local class_pre_solve = class.pre or {}
         for _, v in ipairs(class_pre_solve) do
             table.insert(collision_table[class_name], {type = 'pre', other = v})
         end
-        local class_post_solve = class.post_solve or {}
+        local class_post_solve = class.post or {}
         for _, v in ipairs(class_post_solve) do
             table.insert(collision_table[class_name], {type = 'post', other = v})
         end

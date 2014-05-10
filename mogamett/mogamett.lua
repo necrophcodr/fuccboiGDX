@@ -196,11 +196,55 @@ mm.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
 mm.update = function(dt)
     if mm.lovebird_enabled then mm.lovebird.update() end
     mm.world:update(dt)
-    mm.input:update(dt)
 end
 
 mm.draw = function()
     mm.world:draw()
+end
+
+mm.run = function()
+    local dt = 0
+    local fixed_dt = 1/60
+    local accumulator = 0
+
+    -- Main loop time.
+    while true do
+        -- Process events.
+        if love.event then
+            love.event.pump()
+            for e,a,b,c,d in love.event.poll() do
+                if e == "quit" then
+                    if not love.quit or not love.quit() then
+                        if love.audio then love.audio.stop() end
+                        return
+                    end
+                end
+                love.handlers[e](a,b,c,d)
+            end
+        end
+
+        -- Update dt, as we'll be passing it to update
+        if love.timer then
+            love.timer.step()
+            dt = love.timer.getDelta()
+        end
+
+        -- Call update and draw
+        accumulator = accumulator + dt
+        while accumulator >= fixed_dt do
+            if love.update then love.update(fixed_dt); mm.input:update(dt) end
+            accumulator = accumulator - fixed_dt
+        end
+
+        if love.window and love.graphics then
+            love.graphics.clear()
+            love.graphics.origin()
+            if love.draw then love.draw() end
+            love.graphics.present()
+        end
+
+        if love.timer then love.timer.sleep(0.001) end
+    end
 end
 
 return mm
