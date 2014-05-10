@@ -110,14 +110,14 @@ mm.utils.math.clamp = function(v, min, max)
     return v < min and min or (v > max and max or v)
 end
 mm.utils.math.random = function(min, max)
-    return math.random()*max+min
+    return (min > max and (math.random()*(min - max) + max)) or (math.random()*(max - min) + min)
 end
 mm.utils.math.round = function(n, p)
     local m = math.power(10, p or 0)
     return math.floor(n*m+0.5)/m
 end
 -- misc
-mm.utils.chooseWithProbability = function(choices, chances)
+mm.utils.math.chooseWithProbability = function(choices, chances)
     local r = math.random(1, 1000)
     local intervals = {}
     -- Creates a table with appropriate intervals: 
@@ -172,14 +172,16 @@ mm.path = nil
 mm.zoom = 1
 mm.debug_draw = true
 mm.lovebird_enabled = false
-mm.screen_width = love.window.getWidth()
-mm.screen_height = love.window.getHeight()
+mm.game_width = love.window.getWidth()
+mm.game_height = love.window.getHeight()
 
 -- init
 mm.init = function()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     mm.world = mm.World(mm)
     mm.Collision:generateCategoriesMasks()
+    mm.game_width = love.window.getWidth()
+    mm.game_height = love.window.getHeight()
 end
 
 -- world
@@ -193,8 +195,8 @@ mm.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
 
 mm.update = function(dt)
     if mm.lovebird_enabled then mm.lovebird.update() end
-    mm.input:update(dt)
     mm.world:update(dt)
+    mm.input:update(dt)
 end
 
 mm.draw = function()

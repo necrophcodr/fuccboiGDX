@@ -11,7 +11,7 @@ local Render = {
         self.layers_order = layers_order
     end,
 
-    order = function(self, order_function)
+    renderOrder = function(self, order_function)
         for _, layer_name in ipairs(self.layers_order) do
             table.sort(self.layers[layer_name], order_function)
         end
@@ -27,7 +27,6 @@ local Render = {
     end,
 
     renderUpdate = function(self, dt)
-        -- self.camera:move(self.camera.target.x*self.camera.lerp, self.camera.target.y*self.camera.lerp)
         self.camera:update(dt)
 
         -- Clear dead objects from layers

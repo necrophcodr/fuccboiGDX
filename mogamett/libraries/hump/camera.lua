@@ -43,8 +43,8 @@ local function new(mm, settings)
     local follow_style = settings.follow_style or 'lockon'
     local v = {x = 0, y = 0}
 	return setmetatable({mm = mm, x = x, y = y, scale = zoom, rotation = rotation, follow_lerp = lerp, follow_lead = lead, target = target, v = v,
-                         max_shake_intensity = max_shake_intensity, shake_intensity = 0, shakes = {}, follow_style = follow_style,
-                         shake_p = {x = 0, y = 0}, shake_v = {x = 0, y = 0}, shake_uid = 0, bounds = bounds, last_target_position = nil,
+                         max_shake_intensity = max_shake_intensity, shake_intensity = {x = 0, y = 0}, shakes = {}, follow_style = follow_style,
+                         shake_v = {x = 0, y = 0}, shake_uid = 0, bounds = bounds, last_target_position = nil, debug_draw = false,
                          scroll_target = {x = x, y = y}, game_width = love.graphics.getWidth(), game_height = love.graphics.getHeight()}, camera)
 end
 
@@ -96,28 +96,36 @@ function camera:detach()
 end
 
 function camera:shake(intensity, duration, settings)
+    settings = settings or {}
     self.shake_uid = self.shake_uid + 1
     table.insert(self.shakes, {creation_time = love.timer.getTime(), id = self.uid, intensity = intensity, duration = duration,
-                               shake_direction = settings.shake_direction})
+                               direction = string.lower(settings.direction) or 'both'})
+end
+
+function camera:shakeRemove(id)
+    table.remove(self.shakes, self.mm.utils.findIndexById(self.shakes, id))
 end
 
 function camera:updateShake(dt)
-    self.shake_intensity = 0
-    self.shake_p = {x = self.x, y = self.y}
+    self.shake_intensity = self.mm.Vector(0, 0)
     for _, shake in ipairs(self.shakes) do
         if love.timer.getTime() > shake.creation_time + shake.duration then
             self:shakeRemove(shake.id)
         else
-            if self.shake_intensity + shake.intensity < self.max_intensity then
-                self.shake_intensity = self.shake_intensity + shake.intensity
+            if shake.direction == 'both' or shake.direction == 'horizontal' then
+                if self.shake_intensity.x + shake.intensity < self.max_shake_intensity then
+                    self.shake_intensity.x = self.shake_intensity.x + shake.intensity
+                end
+            end
+            if shake.direction == 'both' or shake.direction == 'vertical' then
+                if self.shake_intensity.y + shake.intensity < self.max_shake_intensity then
+                    self.shake_intensity.y = self.shake_intensity.y + shake.intensity
+                end
             end
         end
     end
 
-    self.shake_v = {x = self.mm.utils.math.random(-self.shake_intensity, self.shake_intensity),
-                    y = self.mm.utils.math.random(-self.shake_intensity, self.shake_intensity)}
-    self:move(self.shake_v.x, self.shake_v.y)
-    if self.shake_intensity == 0 then self:moveTo(self.shake_p.x, self.shake_p.y) end
+    self:move(self.mm.utils.math.random(-self.shake_intensity.x, self.shake_intensity.x), self.mm.utils.math.random(-self.shake_intensity.y, self.shake_intensity.y))
 end
 
 function camera:setBounds(left, top, right, down)
@@ -128,7 +136,21 @@ function camera:removeBounds()
     self.bounds = nil    
 end
 
+function camera:setGameSize()
+    local left, top = self:getWorldCoords(0, 0)
+    local right, bottom = self:getWorldCoords(love.graphics.getWidth(), love.graphics.getHeight())
+    self.game_width = right - left
+    self.game_height = bottom - top
+end
+
+function camera:setDeadzone(deadzone)
+    self:setGameSize()
+    self.follow_style = nil
+    self.deadzone = deadzone 
+end
+
 function camera:follow(target, settings)
+    self:setGameSize()
     self.target = target 
     local settings = settings or {}
     self.follow_style = settings.follow_style or self.follow_style
@@ -140,19 +162,19 @@ function camera:follow(target, settings)
     if self.follow_style == 'lockon' then
         w = self.target.w
         h = self.target.h
-        self.deadzone = {x = 0, y = 0, width = w, height = h}
+        self.deadzone = {x = -w/2, y = -h/2, width = w, height = h}
     elseif self.follow_style == 'screen' then
         self.deadzone = {x = -self.game_width/2, y = -self.game_height/2, width = self.game_width, height = self.game_height}
     elseif self.follow_style == 'platformer' then
         w = self.game_width/8
         h = self.game_height/3
-        self.deadzone = {x = -w/2, y = -h/2, width = w + self.target.w, height = h - self.target.h}
+        self.deadzone = {x = -w/2, y = -h/2 - h/4, width = w, height = h}
     elseif self.follow_style == 'topdown' then
-        helper = math.max(self.game_width, self.game_height)/8 
-        self.deadzone = {x = -helper/2, y = -helper/2, width = helper + self.target.w, height = helper + self.target.h}
+        helper = math.max(self.game_width, self.game_height)/4 
+        self.deadzone = {x = -helper/2, y = -helper/2, width = helper, height = helper}
     elseif self.follow_style == 'topdown-tight' then
-        helper = math.max(self.game_width, self.game_height)/16 
-        self.deadzone = {x = -helper/2, y = -helper/2, width = helper + self.target.w, height = helper + self.target.h}
+        helper = math.max(self.game_width, self.game_height)/8 
+        self.deadzone = {x = -helper/2, y = -helper/2, width = helper, height = helper}
     end
 end
 
@@ -169,11 +191,11 @@ function camera:updateFollow(dt)
         else
             edge = self.target.x - self.deadzone.x
             if self.scroll_target.x > edge then self.scroll_target.x = edge end
-            edge = self.target.x + self.target.w - self.deadzone.x - self.deadzone.width
+            edge = self.target.x - self.deadzone.x - self.deadzone.width
             if self.scroll_target.x < edge then self.scroll_target.x = edge end
             edge = self.target.y - self.deadzone.y
             if self.scroll_target.y > edge then self.scroll_target.y = edge end
-            edge = self.target.y + self.target.h - self.deadzone.y - self.deadzone.height
+            edge = self.target.y - self.deadzone.y - self.deadzone.height
             if self.scroll_target.y < edge then self.scroll_target.y = edge end
         end
         
@@ -193,11 +215,7 @@ function camera:updateFollow(dt)
 end
 
 function camera:update(dt)
-    local left, top = self:getWorldCoords(0, 0)
-    local right, bottom = self:getWorldCoords(love.graphics.getWidth(), love.graphics.getHeight())
-    self.game_width = right - left
-    self.game_height = bottom - top
-
+    self:setGameSize()
     if self.target then self:updateFollow(dt) end
     if self.bounds then
         local camera_left, camera_top = self:getWorldCoords(self.x - self.game_width/2, self.y - self.game_height/2)
@@ -220,7 +238,7 @@ function camera:draw(func)
 end
 
 function camera:debugDraw()
-    if self.mm.debug_draw then
+    if self.debug_draw then
         love.graphics.setLineWidth(2)
         local x, y = self:getCameraCoords(self.x, self.y)
         love.graphics.setColor(255, 255, 255)
@@ -228,13 +246,29 @@ function camera:debugDraw()
         love.graphics.setColor(0, 0, 0)
         love.graphics.circle('line', x, y, 5)
         love.graphics.setColor(255, 255, 255)
+        local tx, ty = 0, 0
         if self.target then
-            local tx, ty = self:getCameraCoords(self.target.x, self.target.y)
+            tx, ty = self:getCameraCoords(self.target.x, self.target.y)
             love.graphics.setColor(222, 64, 64)
             love.graphics.circle('fill', tx, ty, 5)
             love.graphics.setColor(0, 0, 0)
             love.graphics.circle('line', tx, ty, 5)
             love.graphics.setColor(255, 255, 255)
+        end
+        if self.deadzone then
+            local left, top = self.deadzone.x, self.deadzone.y
+            local right, bottom = self.deadzone.width, self.deadzone.height
+            self:attach()
+            love.graphics.setLineWidth(3)
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.rectangle('line', self.x + left, self.y + top, right, bottom)
+            love.graphics.setLineWidth(1.5)
+            love.graphics.setColor(255, 255, 255)
+            love.graphics.rectangle('line', self.x + left, self.y + top, right, bottom)
+            love.graphics.print('Style: ' .. tostring(self.follow_style), self.x + 40, self.y)
+            love.graphics.print('lerp: ' .. tostring(self.follow_lerp), self.x + 40, self.y + 15)
+            love.graphics.print('lead: ' .. tostring(self.follow_lead.x), self.x + 40, self.y + 30)
+            self:detach()
         end
         love.graphics.setLineWidth(1)
     end

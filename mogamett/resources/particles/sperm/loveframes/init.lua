@@ -47,9 +47,11 @@ function loveframes.load()
 	
 	local loveversion = love._version
 	
+    --[[
 	if loveversion ~= "0.8.0" and loveversion ~= "0.9.0" then
 		error("Love Frames is not compatible with your version of LOVE.")
 	end
+    ]]--
 	
 	-- install directory of the library
 	local dir = loveframes.config["DIRECTORY"] or path
