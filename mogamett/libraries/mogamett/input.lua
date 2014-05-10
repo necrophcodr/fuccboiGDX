@@ -36,6 +36,20 @@ function input:down(action)
     end
 end
 
+function input:unbind(key)
+    for action, keys in pairs(self.binds) do
+        for i = #keys, 1, -1 do
+            if key == self.binds[action][i] then
+                table.remove(self.binds[action], i)
+            end
+        end
+    end
+end
+
+function input:unbindAll()
+    self.binds = {}
+end
+
 local copy = function(t1)
     local out = {}
     for k, v in pairs(t1) do out[k] = v end

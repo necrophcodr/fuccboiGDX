@@ -2,7 +2,6 @@ local Collision = require (mogamett_path .. '/world/Collision')
 local Render = require (mogamett_path .. '/world/Render')
 local Factory = require (mogamett_path .. '/world/Factory')
 local Group = require (mogamett_path .. '/world/Group')
-local CameraShake = require (mogamett_path .. '/world/CameraShake')
 local HitFrameStop = require (mogamett_path .. '/world/HitFrameStop')
 local Query = require (mogamett_path .. '/world/Query')
 local Particle = require (mogamett_path .. '/world/Particle')
@@ -13,7 +12,6 @@ World:include(Collision)
 World:include(Render)
 World:include(Factory)
 World:include(Query)
-World:include(CameraShake)
 World:include(HitFrameStop)
 World:include(Particle)
 
@@ -24,7 +22,6 @@ function World:init(mm)
     self:renderInit()
     self:factoryInit()
     self:queryInit()
-    self:cameraShakeInit()
     self:hitFrameStopInit()
     self:particleInit()
     love.physics.setMeter(32)
@@ -35,7 +32,7 @@ function World:init(mm)
     self.stopped = false
 
     for class_name, _ in pairs(self.mm.classes) do print(class_name); self:addGroup(class_name) end
-    local collision_table = self.mm._Collision.getCollisionCallbacksTable()
+    local collision_table = self.mm.Collision:getCollisionCallbacksTable()
     for class_name, collision_list in pairs(collision_table) do
         for _, collision_info in ipairs(collision_list) do
             if collision_info.type == 'enter' then 
@@ -61,7 +58,6 @@ function World:update(dt)
     for _, group in ipairs(self.groups) do group:update(dt) end
     for _, entity in ipairs(self.entities) do entity:update(dt) end
     self:renderUpdate(dt)
-    self:cameraShakeUpdate(dt)
     self.world:update(dt)
     self:createPostWorldStep()
     self:removePostWorldStep()
@@ -74,6 +70,7 @@ function World:draw()
     self:renderAttach()
     self:renderDraw()
     self:renderDetach()
+    self.camera:debugDraw()
 end
 
 function World:setGravity(x, y)

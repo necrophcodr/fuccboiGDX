@@ -1,19 +1,17 @@
 local Render = {
     renderInit = function(self)
-        self.camera = self.mm.Camera()
-        self.camera_zoom = 1
-        self.camera_v = self.mm.Vector(0, 0)
-        self.camera_v_multiplier = 0.2
+        self.camera = self.mm.Camera(self.mm)
+
         self.layers = {}
         self.layers_order = {'Default'}
         self:addLayer('Default')
     end,
 
-    setLayerOrder = function(layers_order)
+    setLayerOrder = function(self, layers_order)
         self.layers_order = layers_order
     end,
 
-    order = function(order_function)
+    order = function(self, order_function)
         for _, layer_name in ipairs(self.layers_order) do
             table.sort(self.layers[layer_name], order_function)
         end
@@ -28,13 +26,9 @@ local Render = {
         if self.layers[layer_name] then table.insert(self.layers[layer_name], object) end
     end,
 
-    renderUpdate = function(self, dt, follow)
-        -- Camera movement, follows follow
-        if follow then
-            local x, y = self.camera:pos()
-            self.camera_v = mm.Vector(follow.x - x, follow.y - y)
-            self.camera:move(self.camera_v.x*self.camera_v_multiplier, self.camera_v.y*self.camera_v_multiplier)
-        end
+    renderUpdate = function(self, dt)
+        -- self.camera:move(self.camera.target.x*self.camera.lerp, self.camera.target.y*self.camera.lerp)
+        self.camera:update(dt)
 
         -- Clear dead objects from layers
         for layer_name, layer in pairs(self.layers) do
@@ -42,8 +36,6 @@ local Render = {
                 if self.layers[layer_name][i].dead then table.remove(self.layers[layer_name], i) end
             end
         end
-
-        self.camera:zoomTo(mg.zoom)
     end,
 
     renderAttach = function(self)

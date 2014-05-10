@@ -30,34 +30,45 @@ local cos, sin = math.cos, math.sin
 local camera = {}
 camera.__index = camera
 
-local function new(x,y, zoom, rot)
-	x,y  = x or love.graphics.getWidth()/2, y or love.graphics.getHeight()/2
-	zoom = zoom or 1
-	rot  = rot or 0
-	return setmetatable({x = x, y = y, scale = zoom, rot = rot}, camera)
+local function new(mm, settings)
+    local settings = settings or {}
+	local x, y  = settings.x or love.graphics.getWidth()/2, settings.y or love.graphics.getHeight()/2
+	local zoom = settings.zoom or 1
+	local rotation = settings.rotation or 0
+    local lerp = settings.lerp or 0
+    local lead = settings.lead or {x = 0, y = 0}
+    local target = settings.target
+    local bounds = settings.bounds
+    local max_shake_intensity = settings.max_shake_intensity or 15
+    local follow_style = settings.follow_style or 'lockon'
+    local v = {x = 0, y = 0}
+	return setmetatable({mm = mm, x = x, y = y, scale = zoom, rotation = rotation, follow_lerp = lerp, follow_lead = lead, target = target, v = v,
+                         max_shake_intensity = max_shake_intensity, shake_intensity = 0, shakes = {}, follow_style = follow_style,
+                         shake_p = {x = 0, y = 0}, shake_v = {x = 0, y = 0}, shake_uid = 0, bounds = bounds, last_target_position = nil,
+                         scroll_target = {x = x, y = y}, game_width = love.graphics.getWidth(), game_height = love.graphics.getHeight()}, camera)
 end
 
-function camera:lookAt(x,y)
+function camera:moveTo(x, y)
 	self.x, self.y = x,y
 	return self
 end
 
-function camera:move(x,y)
+function camera:move(x, y)
 	self.x, self.y = self.x + x, self.y + y
 	return self
 end
 
-function camera:pos()
+function camera:getPosition()
 	return self.x, self.y
 end
 
 function camera:rotate(phi)
-	self.rot = self.rot + phi
+	self.rotation = self.rotation + phi
 	return self
 end
 
 function camera:rotateTo(phi)
-	self.rot = phi
+	self.rotation = phi
 	return self
 end
 
@@ -76,12 +87,130 @@ function camera:attach()
 	love.graphics.push()
 	love.graphics.scale(self.scale)
 	love.graphics.translate(cx, cy)
-	love.graphics.rotate(self.rot)
+	love.graphics.rotate(self.rotation)
 	love.graphics.translate(-self.x, -self.y)
 end
 
 function camera:detach()
 	love.graphics.pop()
+end
+
+function camera:shake(intensity, duration, settings)
+    self.shake_uid = self.shake_uid + 1
+    table.insert(self.shakes, {creation_time = love.timer.getTime(), id = self.uid, intensity = intensity, duration = duration,
+                               shake_direction = settings.shake_direction})
+end
+
+function camera:updateShake(dt)
+    self.shake_intensity = 0
+    self.shake_p = {x = self.x, y = self.y}
+    for _, shake in ipairs(self.shakes) do
+        if love.timer.getTime() > shake.creation_time + shake.duration then
+            self:shakeRemove(shake.id)
+        else
+            if self.shake_intensity + shake.intensity < self.max_intensity then
+                self.shake_intensity = self.shake_intensity + shake.intensity
+            end
+        end
+    end
+
+    self.shake_v = {x = self.mm.utils.math.random(-self.shake_intensity, self.shake_intensity),
+                    y = self.mm.utils.math.random(-self.shake_intensity, self.shake_intensity)}
+    self:move(self.shake_v.x, self.shake_v.y)
+    if self.shake_intensity == 0 then self:moveTo(self.shake_p.x, self.shake_p.y) end
+end
+
+function camera:setBounds(left, top, right, down)
+    self.bounds = {left = left, top = top, right = right, down = down} 
+end
+
+function camera:removeBounds()
+    self.bounds = nil    
+end
+
+function camera:follow(target, settings)
+    self.target = target 
+    local settings = settings or {}
+    self.follow_style = settings.follow_style or self.follow_style
+    self.follow_lead = settings.lead or self.follow_lead
+    self.follow_lerp = settings.lerp or self.follow_lerp
+    local w, h = 0, 0
+    local helper = 0
+
+    if self.follow_style == 'lockon' then
+        w = self.target.w
+        h = self.target.h
+        self.deadzone = {x = 0, y = 0, width = w, height = h}
+    elseif self.follow_style == 'screen' then
+        self.deadzone = {x = -self.game_width/2, y = -self.game_height/2, width = self.game_width, height = self.game_height}
+    elseif self.follow_style == 'platformer' then
+        w = self.game_width/8
+        h = self.game_height/3
+        self.deadzone = {x = -w/2, y = -h/2, width = w + self.target.w, height = h - self.target.h}
+    elseif self.follow_style == 'topdown' then
+        helper = math.max(self.game_width, self.game_height)/8 
+        self.deadzone = {x = -helper/2, y = -helper/2, width = helper + self.target.w, height = helper + self.target.h}
+    elseif self.follow_style == 'topdown-tight' then
+        helper = math.max(self.game_width, self.game_height)/16 
+        self.deadzone = {x = -helper/2, y = -helper/2, width = helper + self.target.w, height = helper + self.target.h}
+    end
+end
+
+function camera:updateFollow(dt)
+    local Vector = self.mm.Vector
+    if not self.deadzone then self:moveTo(self.target.x, self.target.y)
+    else
+        local edge = 0
+        if self.follow_style == 'screen' then
+            if self.target.x > (self.x + self.game_width/2) then self.scroll_target.x = self.scroll_target.x + self.game_width
+            elseif self.target.x < (self.x  - self.game_width/2) then self.scroll_target.x = self.scroll_target.x - self.game_width
+            elseif self.target.y > (self.y + self.game_height/2) then self.scroll_target.y = self.scroll_target.y + self.game_height
+            elseif self.target.y < (self.y - self.game_height/2) then self.scroll_target.y = self.scroll_target.y - self.game_height end
+        else
+            edge = self.target.x - self.deadzone.x
+            if self.scroll_target.x > edge then self.scroll_target.x = edge end
+            edge = self.target.x + self.target.w - self.deadzone.x - self.deadzone.width
+            if self.scroll_target.x < edge then self.scroll_target.x = edge end
+            edge = self.target.y - self.deadzone.y
+            if self.scroll_target.y > edge then self.scroll_target.y = edge end
+            edge = self.target.y + self.target.h - self.deadzone.y - self.deadzone.height
+            if self.scroll_target.y < edge then self.scroll_target.y = edge end
+        end
+        
+        if not self.last_target_position then self.last_target_position = Vector(self.target.x, self.target.y) end
+        self.scroll_target.x = self.scroll_target.x + (self.target.x - self.last_target_position.x)*self.follow_lead.x
+        self.scroll_target.y = self.scroll_target.y + (self.target.y - self.last_target_position.y)*self.follow_lead.y
+        self.last_target_position.x = self.target.x
+        self.last_target_position.y = self.target.y
+
+        if self.follow_lerp == 0 then
+
+        else
+            self:move((self.scroll_target.x - self.x)*dt/(dt+self.follow_lerp*dt),
+                      (self.scroll_target.y - self.y)*dt/(dt+self.follow_lerp*dt))
+        end
+    end
+end
+
+function camera:update(dt)
+    local left, top = self:getWorldCoords(0, 0)
+    local right, bottom = self:getWorldCoords(love.graphics.getWidth(), love.graphics.getHeight())
+    self.game_width = right - left
+    self.game_height = bottom - top
+
+    if self.target then self:updateFollow(dt) end
+    if self.bounds then
+        local camera_left, camera_top = self:getWorldCoords(self.x - self.game_width/2, self.y - self.game_height/2)
+        local camera_right, camera_bottom = self:getWorldCoords(self.x + self.game_width/2, self.y + self.game_height/2)
+        local left = self.mm.utils.math.clamp(camera_left, self.bounds.left, self.bounds.right)
+        local right = self.mm.utils.math.clamp(camera_right, self.bounds.left, self.bounds.right)
+        local top = self.mm.utils.math.clamp(camera_top, self.bounds.top, self.bounds.down)
+        local bottom = self.mm.utils.math.clamp(camera_bottom, self.bounds.top, self.bounds.down)
+        self.x = self.mm.utils.math.clamp(self.x, left, right)
+        self.y = self.mm.utils.math.clamp(self.y, top, bottom)
+    end
+    self:updateShake(dt)
+    self:zoomTo(self.mm.zoom)
 end
 
 function camera:draw(func)
@@ -90,25 +219,46 @@ function camera:draw(func)
 	self:detach()
 end
 
-function camera:cameraCoords(x,y)
+function camera:debugDraw()
+    if self.mm.debug_draw then
+        love.graphics.setLineWidth(2)
+        local x, y = self:getCameraCoords(self.x, self.y)
+        love.graphics.setColor(255, 255, 255)
+        love.graphics.circle('fill', x, y, 5)
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.circle('line', x, y, 5)
+        love.graphics.setColor(255, 255, 255)
+        if self.target then
+            local tx, ty = self:getCameraCoords(self.target.x, self.target.y)
+            love.graphics.setColor(222, 64, 64)
+            love.graphics.circle('fill', tx, ty, 5)
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.circle('line', tx, ty, 5)
+            love.graphics.setColor(255, 255, 255)
+        end
+        love.graphics.setLineWidth(1)
+    end
+end
+
+function camera:getCameraCoords(x,y)
 	-- x,y = ((x,y) - (self.x, self.y)):rotated(self.rot) * self.scale + center
 	local w,h = love.graphics.getWidth(), love.graphics.getHeight()
-	local c,s = cos(self.rot), sin(self.rot)
+	local c,s = cos(self.rotation), sin(self.rotation)
 	x,y = x - self.x, y - self.y
 	x,y = c*x - s*y, s*x + c*y
 	return x*self.scale + w/2, y*self.scale + h/2
 end
 
-function camera:worldCoords(x,y)
+function camera:getWorldCoords(x,y)
 	-- x,y = (((x,y) - center) / self.scale):rotated(-self.rot) + (self.x,self.y)
 	local w,h = love.graphics.getWidth(), love.graphics.getHeight()
-	local c,s = cos(-self.rot), sin(-self.rot)
+	local c,s = cos(-self.rotation), sin(-self.rotation)
 	x,y = (x - w/2) / self.scale, (y - h/2) / self.scale
 	x,y = c*x - s*y, s*x + c*y
 	return x+self.x, y+self.y
 end
 
-function camera:mousepos()
+function camera:getMousePosition()
 	return self:worldCoords(love.mouse.getPosition())
 end
 
