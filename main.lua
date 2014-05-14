@@ -5,11 +5,15 @@ function love.load()
 
     mg.init()
 
-    mg.world:createEntity('Girl', 400, 300)
+    mg.world:createEntity('Girl', 400, 300, {controlled = true})
+    for i = 1, 200 do 
+        mg.world:createEntity('Girl', mg.utils.math.random(0, 800), mg.utils.math.random(0, 600))
+    end
 end
 
 function love.update(dt)
     mg.update(dt)
+    mg.world:sortRenderOrder(function(a, b) return a.y < b.y end)
 end
 
 function love.draw()
