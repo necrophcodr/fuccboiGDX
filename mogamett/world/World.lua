@@ -15,8 +15,8 @@ World:include(Query)
 World:include(HitFrameStop)
 World:include(Particle)
 
-function World:init(mm)
-    self.mg = mm
+function World:init(mg)
+    self.mg = mg
     self.id = self.mg.getUID()
     self:collisionInit()
     self:renderInit()
@@ -73,10 +73,6 @@ function World:draw()
     self.camera:debugDraw()
 end
 
-function World:setGravity(x, y)
-    self.world:setGravity(x or 0, y or 0)
-end
-
 function World:getAllEntities()
     local entities = {}
     for _, group in ipairs(self.groups) do
@@ -89,7 +85,7 @@ function World:getAllEntities()
 end
 
 function World:addGroup(group_name)
-    table.insert(self.groups, Group(self, group_name))
+    table.insert(self.groups, Group(group_name))
 end
 
 function World:addToGroup(group_name, entity)

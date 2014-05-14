@@ -1,6 +1,11 @@
 function love.load()
     mg = require 'mogamett/mogamett'
+
+    require 'Girl'
+
     mg.init()
+
+    mg.world:createEntity('Girl', 400, 300)
 end
 
 function love.update(dt)

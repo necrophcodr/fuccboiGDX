@@ -1,9 +1,10 @@
 local PhysicsBody = {
     physicsBodyInit = function(self, world, x, y, settings)
         settings = settings or {}
-        self.body = love.physics.newBody(world, x, y, settings.body_type or 'dynamic')
+        self.body = love.physics.newBody(world.world, x, y, settings.body_type or 'dynamic')
         self.body:setFixedRotation(true)
-        self.shape_name = string.lower(settings.shape) or 'rectangle'
+        settings.shape = settings.shape or 'rectangle'
+        self.shape_name = string.lower(settings.shape)
         if self.shape_name == 'bsgrectangle' then
             local w, h, s = settings.w or 32, settings.h or 32, settings.s or 4
             self.w, self.h = w, h
