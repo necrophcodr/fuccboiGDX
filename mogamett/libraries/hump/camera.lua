@@ -30,7 +30,10 @@ local cos, sin = math.cos, math.sin
 local camera = {}
 camera.__index = camera
 
-local function new(mm, settings)
+local utils = require (mogamett_path .. '/libraries/mogamett/utils')
+local Vector = require (mogamett_path .. '/libraries/hump/vector')
+
+local function new(settings)
     local settings = settings or {}
 	local x, y  = settings.x or love.graphics.getWidth()/2, settings.y or love.graphics.getHeight()/2
 	local zoom = settings.zoom or 1
@@ -42,7 +45,7 @@ local function new(mm, settings)
     local max_shake_intensity = settings.max_shake_intensity or 15
     local follow_style = settings.follow_style or 'lockon'
     local v = {x = 0, y = 0}
-	return setmetatable({mm = mm, x = x, y = y, scale = zoom, rotation = rotation, follow_lerp = lerp, follow_lead = lead, target = target, v = v,
+	return setmetatable({x = x, y = y, scale = zoom, rotation = rotation, follow_lerp = lerp, follow_lead = lead, target = target, v = v,
                          max_shake_intensity = max_shake_intensity, shake_intensity = {x = 0, y = 0}, shakes = {}, follow_style = follow_style,
                          shake_v = {x = 0, y = 0}, shake_uid = 0, bounds = bounds, last_target_position = nil, debug_draw = false,
                          scroll_target = {x = x, y = y}, game_width = love.graphics.getWidth(), game_height = love.graphics.getHeight()}, camera)
@@ -103,11 +106,11 @@ function camera:shake(intensity, duration, settings)
 end
 
 function camera:shakeRemove(id)
-    table.remove(self.shakes, self.mm.utils.findIndexById(self.shakes, id))
+    table.remove(self.shakes, utils.findIndexById(self.shakes, id))
 end
 
 function camera:updateShake(dt)
-    self.shake_intensity = self.mm.Vector(0, 0)
+    self.shake_intensity = Vector(0, 0)
     for _, shake in ipairs(self.shakes) do
         if love.timer.getTime() > shake.creation_time + shake.duration then
             self:shakeRemove(shake.id)
@@ -125,7 +128,7 @@ function camera:updateShake(dt)
         end
     end
 
-    self:move(self.mm.utils.math.random(-self.shake_intensity.x, self.shake_intensity.x), self.mm.utils.math.random(-self.shake_intensity.y, self.shake_intensity.y))
+    self:move(utils.math.random(-self.shake_intensity.x, self.shake_intensity.x), utils.math.random(-self.shake_intensity.y, self.shake_intensity.y))
 end
 
 function camera:setBounds(left, top, right, down)
@@ -143,10 +146,10 @@ function camera:setGameSize()
     self.game_height = bottom - top
 end
 
-function camera:setDeadzone(deadzone)
+function camera:setDeadzone(left, top, right, down)
     self:setGameSize()
     self.follow_style = nil
-    self.deadzone = deadzone 
+    self.deadzone = {x = left, y = top, width = right, height = down}
 end
 
 function camera:follow(target, settings)
@@ -179,7 +182,6 @@ function camera:follow(target, settings)
 end
 
 function camera:updateFollow(dt)
-    local Vector = self.mm.Vector
     if not self.deadzone then self:moveTo(self.target.x, self.target.y)
     else
         local edge = 0
@@ -220,15 +222,14 @@ function camera:update(dt)
     if self.bounds then
         local camera_left, camera_top = self:getWorldCoords(self.x - self.game_width/2, self.y - self.game_height/2)
         local camera_right, camera_bottom = self:getWorldCoords(self.x + self.game_width/2, self.y + self.game_height/2)
-        local left = self.mm.utils.math.clamp(camera_left, self.bounds.left, self.bounds.right)
-        local right = self.mm.utils.math.clamp(camera_right, self.bounds.left, self.bounds.right)
-        local top = self.mm.utils.math.clamp(camera_top, self.bounds.top, self.bounds.down)
-        local bottom = self.mm.utils.math.clamp(camera_bottom, self.bounds.top, self.bounds.down)
-        self.x = self.mm.utils.math.clamp(self.x, left, right)
-        self.y = self.mm.utils.math.clamp(self.y, top, bottom)
+        local left = utils.math.clamp(camera_left, self.bounds.left, self.bounds.right)
+        local right = utils.math.clamp(camera_right, self.bounds.left, self.bounds.right)
+        local top = utils.math.clamp(camera_top, self.bounds.top, self.bounds.down)
+        local bottom = utils.math.clamp(camera_bottom, self.bounds.top, self.bounds.down)
+        self.x = utils.math.clamp(self.x, left, right)
+        self.y = utils.math.clamp(self.y, top, bottom)
     end
     self:updateShake(dt)
-    self:zoomTo(self.mm.zoom)
 end
 
 function camera:draw(func)

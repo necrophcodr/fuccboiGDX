@@ -28,8 +28,8 @@ local PhysicsBody = {
 
         local name = settings.other or self.class.name
         self.fixture = love.physics.newFixture(self.body, self.shape)
-        self.fixture:setCategory(unpack(self.world.mm.Collision.masks[self.class.name].categories))
-        self.fixture:setMask(unpack(self.world.mm.Collision.masks[self.class.name].masks))
+        self.fixture:setCategory(unpack(self.world.mg.Collision.masks[self.class.name].categories))
+        self.fixture:setMask(unpack(self.world.mg.Collision.masks[self.class.name].masks))
         self.fixture:setUserData(self)
         self.sensor = love.physics.newFixture(self.body, self.shape)
         self.sensor:setSensor(true)
@@ -41,7 +41,7 @@ local PhysicsBody = {
     end,
 
     physicsBodyDraw = function(self)
-        if self.world.mm.debug_draw then
+        if self.world.mg.debug_draw then
             if self.shape_name == 'bsgrectangle' or self.shape_name == 'polygon' or self.shape_name == 'rectangle' then
                 love.graphics.setColor(64, 128, 244)
                 love.graphics.polygon('line', self.body:getWorldPoints(self.shape:getPoints()))

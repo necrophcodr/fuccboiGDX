@@ -16,8 +16,8 @@ World:include(HitFrameStop)
 World:include(Particle)
 
 function World:init(mm)
-    self.mm = mm
-    self.id = self.mm.getUID()
+    self.mg = mm
+    self.id = self.mg.getUID()
     self:collisionInit()
     self:renderInit()
     self:factoryInit()
@@ -31,8 +31,8 @@ function World:init(mm)
     self.entities = {}
     self.stopped = false
 
-    for class_name, _ in pairs(self.mm.classes) do self:addGroup(class_name) end
-    local collision_table = self.mm.Collision:getCollisionCallbacksTable()
+    for class_name, _ in pairs(self.mg.classes) do self:addGroup(class_name) end
+    local collision_table = self.mg.Collision:getCollisionCallbacksTable()
     for class_name, collision_list in pairs(collision_table) do
         for _, collision_info in ipairs(collision_list) do
             if collision_info.type == 'enter' then 
@@ -101,11 +101,11 @@ function World:addToGroup(group_name, entity)
     end
 end
 
-function World:getEntityByName(name)
+function World:getEntityById(id)
     for _, group in ipairs(self.groups) do
         local group_entities = group:getEntities()
         for _, group_entity in ipairs(group_entities) do
-            if group_entity.name == name then
+            if group_entity.id == id then
                 return group_entity
             end
         end
@@ -134,7 +134,7 @@ end
 function World:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
-            if self.entities[i].class:includes(Timer) then self.entities[i]:timerDestroy() end
+            if self.entities[i].timer then self.entities[i].timer:destroy() end
             if self.entities[i].class:includes(PhysicsBody) then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
@@ -152,6 +152,7 @@ function World:destroy()
     for _, group in ipairs(self.groups) do
         group:apply(function(entity) entity.dead = true end)
     end
+    self:renderUpdate(0)
     for i, group in ipairs(self.groups) do 
         group:removePostWorldStep() 
         group:destroy()
@@ -160,47 +161,8 @@ function World:destroy()
         entity.dead = true
     end
     self:removePostWorldStep()
-    self.entities = nil
-    self.groups = nil
-    self.camera = nil
-    self.groups = nil
-    self.world = nil
-end
-
-function World:keypressed(key)
-    for _, group in ipairs(self.groups) do group:keypressed(key) end
-    for _, entity in ipairs(self.entities) do 
-        if entity.keypressed then
-            entity:keypressed(key) 
-        end
-    end
-end
-
-function World:keyreleased(key)
-    for _, group in ipairs(self.groups) do group:keyreleased(key) end
-    for _, entity in ipairs(self.entities) do 
-        if entity.keyreleased then
-            entity:keyreleased(key) 
-        end
-    end
-end
-
-function World:mousepressed(x, y, button)
-    for _, group in ipairs(self.groups) do group:mousepressed(x, y, button) end
-    for _, entity in ipairs(self.entities) do 
-        if entity.mousepressed then
-            entity:mousepressed(x, y, button) 
-        end
-    end
-end
-
-function World:mousereleased(x, y, button)
-    for _, group in ipairs(self.groups) do group:mousereleased(x, y, button) end
-    for _, entity in ipairs(self.entities) do 
-        if entity.mousereleased then
-            entity:mousereleased(x, y, button) 
-        end
-    end
+    self.entities = {}
+    self.groups = {}
 end
 
 return World

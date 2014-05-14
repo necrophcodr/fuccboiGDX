@@ -16,10 +16,10 @@ local Factory = {
     createPostWorldStep = function(self)
         for _, o in ipairs(self.to_be_created) do
             local entity = nil
-            if o.type then entity = self.mm.classes[o.type](self, o.x, o.y, o.settings) end
+            if o.type then entity = self.mg.classes[o.type](self, o.x, o.y, o.settings) end
             if entity then
                 self:addToGroup(o.type, entity)
-                self:addToLayer(self.mm.classes.layer or 'Default', entity)
+                self:addToLayer(self.mg.classes.layer or 'Default', entity)
             end
         end
         self.to_be_created = {}

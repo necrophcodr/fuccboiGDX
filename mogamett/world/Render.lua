@@ -1,6 +1,6 @@
 local Render = {
     renderInit = function(self)
-        self.camera = self.mm.Camera(self.mm)
+        self.camera = self.mg.Camera(self.mg)
 
         self.layers = {}
         self.layers_order = {'Default'}
@@ -11,7 +11,11 @@ local Render = {
         self.layers_order = layers_order
     end,
 
-    renderOrder = function(self, order_function)
+    sortLayerRenderOrder = function(self, layer_name, order_function)
+        table.sort(self.layers[layer_name], order_function)
+    end,
+
+    sortRenderOrder = function(self, order_function)
         for _, layer_name in ipairs(self.layers_order) do
             table.sort(self.layers[layer_name], order_function)
         end

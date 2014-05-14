@@ -34,11 +34,11 @@ local Query = {
 
     end,
 
-    queryName = function(self, name, type)
+    queryId = function(self, id, type)
         for _, group in ipairs(self.groups) do
             if group.name == type then
                 for _, object in ipairs(group:getEntities()) do
-                    if object.name == name then
+                    if object.id == id then
                         return object
                     end
                 end
@@ -69,14 +69,14 @@ local Query = {
         return out_object
     end,
 
-    queryAreaCircle = function(self, position, radius, object_types)
+    queryAreaCircle = function(self, x, y, radius, object_types)
         local objects = {}
         for _, type in ipairs(object_types) do
             for _, group in ipairs(self.groups) do
                 if group.name == type then
                     for _, object in ipairs(group:getEntities()) do
-                        local x, y = object.body:getPosition()
-                        local dx, dy = math.abs(position.x - x), math.abs(position.y - y)
+                        local _x, _y = object.body:getPosition()
+                        local dx, dy = math.abs(x - _x), math.abs(y - _y)
                         local distance = math.sqrt(dx*dx + dy*dy)
                         if distance < radius then 
                             table.insert(objects, object)
@@ -88,14 +88,14 @@ local Query = {
         return objects
     end,
 
-    queryAreaRectangle = function(self, position, w, h, object_types)
+    queryAreaRectangle = function(self, x, y, w, h, object_types)
         local objects = {}
         for _, type in ipairs(object_types) do
             for _, group in ipairs(self.groups) do
                 if group.name == type then
                     for _, object in ipairs(group:getEntities()) do
-                        local x, y = object.body:getPosition()
-                        local dx, dy = math.abs(position.x - x), math.abs(position.y - y)
+                        local _x, _y = object.body:getPosition()
+                        local dx, dy = math.abs(x - _x), math.abs(y - _y)
                         if dx <= object.w/2 + w/2 and dy <= object.h/2 + h/2 then
                             table.insert(objects, object)
                         end
@@ -112,8 +112,8 @@ local Query = {
             for _, group in ipairs(self.groups) do
                 if group.name == type then
                     for _, object in ipairs(group:getEntities()) do
-                        if object.class:includes(PhysicsRectangle) or object.class:includes(PhysicsBSGRectangle) or
-                           object.class:includes(PhysicsPolygon) then
+                        if object.shape_name == 'chain' or object.shape_name == 'bsgrectangle' or 
+                           object.shape_name == 'rectangle' or object.shape_name == 'polygon' then
                             -- Get object lines
                             local object_lines = {}
                             local object_points = {object.body:getWorldPoints(object.shape:getPoints())}
@@ -150,14 +150,32 @@ local Query = {
         return objects
     end,
 
-    applyAreaRectangle = function(self, position, w, h, object_types, action)
-        local objects = self:queryAreaRectangle(position, w, h, object_types)
+    applyAreaRectangle = function(self, x, y, w, h, object_types, action)
+        local objects = self:queryAreaRectangle(x, y, w, h, object_types)
         if #objects > 0 then
             for _, object in ipairs(objects) do
                 action(object)
             end
         end
-    end
+    end,
+    
+    applyAreaCircle = function(self, x, y, r, object_types, action)
+        local objects = self:queryAreaCircle(x, y, r, object_types)
+        if #objects > 0 then
+            for _, object in ipairs(objects) do
+                action(object)
+            end
+        end
+    end,
+
+    applyAreaLine = function(self, x1, y1, x2, y2, object_types, action)
+        local objects = self:queryAreaLine(x1, y1, x2, y2, object_types)
+        if #objects > 0 then
+            for _, object in ipairs(objects) do
+                action(object)
+            end
+        end
+    end,
 }
 
 return Query

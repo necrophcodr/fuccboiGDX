@@ -1,8 +1,9 @@
 local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
 local Group = class('Group')
 
-function Group:init(world, name)
-    self.world = world
+local utils = require (mogamett_path .. '/libraries/mogamett/utils')
+
+function Group:init(name)
     self.name = name
     self.entities = {}
 end
@@ -15,10 +16,10 @@ function Group:update(dt)
     end
 end
 
-function Group:draw(offset_x, offset_y)
+function Group:draw()
     for _, entity in ipairs(self.entities) do 
         if entity.draw then
-            entity:draw(offset_x, offset_y)
+            entity:draw()
         end
     end
 end
@@ -28,13 +29,13 @@ function Group:add(entity)
 end
 
 function Group:remove(id)
-    table.remove(self.entities, self.world.mm.utils.findIndexByID(self.entities, id))
+    table.remove(self.entities, utils.findIndexByID(self.entities, id))
 end
 
 function Group:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
-            if self.entities[i].class:includes(Timer) then self.entities[i]:timerDestroy() end
+            if self.entities[i].timer then self.entities[i].timer:destroy() end
             if self.entities[i].class:includes(PhysicsBody) then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
@@ -59,45 +60,6 @@ end
 
 function Group:apply(action)
     for _, entity in ipairs(self.entities) do action(entity) end
-end
-
-function Group:call(action_name, ...)
-    for _, entity in ipairs(self.entities) do
-        if entity[action_name] then entity[action_name](...) end
-    end
-end
-
-function Group:keypressed(key)
-    for _, entity in ipairs(self.entities) do 
-        if entity.keypressed then
-            entity:keypressed(key)
-        end
-    end
-end
-
-function Group:keyreleased(key)
-    for _, entity in ipairs(self.entities) do 
-        if entity.keyreleased then
-            entity:keyreleased(key)
-        end
-    end
-    
-end
-
-function Group:mousepressed(x, y, button)
-    for _, entity in ipairs(self.entities) do 
-        if entity.mousepressed then
-            entity:mousepressed(x, y, button)
-        end
-    end
-end
-
-function Group:mousereleased(x, y, button)
-    for _, entity in ipairs(self.entities) do 
-        if entity.mousereleased then
-            entity:mousereleased(x, y, button)
-        end
-    end
 end
 
 return Group

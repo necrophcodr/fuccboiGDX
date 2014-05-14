@@ -27,6 +27,8 @@ THE SOFTWARE.
 local Timer = {}
 Timer.__index = Timer
 
+local utils = require (mogamett_path .. '/libraries/mogamett/utils')
+
 local function _nothing_() end
 
 local function new()
@@ -49,23 +51,25 @@ function Timer:update(dt)
 	end
 end
 
-function Timer:do_for(delay, func, after)
+function Timer:during(delay, func, after)
 	local handle = {func = func, after = after or _nothing_}
-	self.functions[handle] = delay
+    local actual_delay = delay
+    if type(delay) == 'table' then actual_delay = utils.math.random(delay[1], delay[2]) end
+	self.functions[handle] = actual_delay
 	return handle
 end
 
 function Timer:after(delay, func)
     local actual_delay = delay
-    if type(delay) == 'table' then actual_delay = math.prandom(delay[1], delay[2]) end
-	return self:do_for(actual_delay, _nothing_, func)
+    if type(delay) == 'table' then actual_delay = utils.math.random(delay[1], delay[2]) end
+	return self:during(actual_delay, _nothing_, func)
 end
 
 function Timer:every(delay, func, count)
 	local count, handle = count or math.huge -- exploit below: math.huge - 1 = math.huge
 
     local actual_delay = delay
-    if type(delay) == 'table' then actual_delay = math.prandom(delay[1], delay[2]) end
+    if type(delay) == 'table' then actual_delay = utils.math.random(delay[1], delay[2]) end
 
 	handle = self:after(actual_delay, function(f)
 		if func(func) == false then return end
@@ -142,7 +146,7 @@ __call = function(tween, self, len, subject, target, method, after, ...)
 	local payload, t, args = tween_collect_payload(subject, target, {}), 0, {...}
 
 	local last_s = 0
-	return self:do_for(len, function(dt)
+	return self:during(len, function(dt)
 		t = t + dt
 		local s = method(math.min(1, t/len), unpack(args))
 		local ds = s - last_s
@@ -182,7 +186,7 @@ local default = new()
 return setmetatable({
 	new         = new,
 	update      = function(...) return default:update(...) end,
-	do_for      = function(...) return default:do_for(...) end,
+	during      = function(...) return default:during(...) end,
 	after       = function(...) return default:after(...) end,
 	every       = function(...) return default:every(...) end,
 	cancel      = function(...) return default:cancel(...) end,

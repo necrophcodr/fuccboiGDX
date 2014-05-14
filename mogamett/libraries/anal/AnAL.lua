@@ -32,7 +32,7 @@ animation.__index = animation
 -- @param fw The frame width
 -- @param fh The frame height
 -- @param delay The delay between two frames
--- @param frames The number of frames, 0 for autodetect
+-- @param frames The number of frames, 0 or nil for autodetect
 -- @return The created animation
 function animation.new(image, fw, fh, delay, frames)
 	local a = {}
@@ -41,9 +41,9 @@ function animation.new(image, fw, fh, delay, frames)
 	a.delays = {}
 	a.timer = 0
     a.delay = delay
-	a.position = 1
-	a.fw = fw
-	a.fh = fh
+	a.current_frame = 1
+	a.frame_width = fw
+	a.frame_height = fh 
 	a.playing = true
 	a.speed = 1
 	a.mode = 1
@@ -54,7 +54,7 @@ function animation.new(image, fw, fh, delay, frames)
 	if frames == 0 then
 		frames = imgw / fw * imgh / fh
 	end
-    a.n_frames = frames
+    a.size = frames
 	local rowsize = imgw/fw
 	for i = 1, frames do
 		local row = math.floor((i-1)/rowsize)
@@ -71,29 +71,29 @@ end
 function animation:update(dt)
 	if not self.playing then return end
 	self.timer = self.timer + dt * self.speed
-	if self.timer > self.delays[self.position] then
-		self.timer = self.timer - self.delays[self.position]
-		self.position = self.position + 1 * self.direction
-		if self.position > #self.frames then
+	if self.timer > self.delays[self.current_frame] then
+		self.timer = self.timer - self.delays[self.current_frame]
+		self.current_frame = self.current_frame + 1 * self.direction
+		if self.current_frame > #self.frames then
 			if self.mode == 1 then
-				self.position = 1
+				self.current_frame = 1
 			elseif self.mode == 2 then
-				self.position = self.position - 1
+				self.current_frame = self.current_frame - 1
 				self:stop()
 			elseif self.mode == 3 then
 				self.direction = -1
-				self.position = self.position - 1
+				self.current_frame = self.current_frame - 1
 			end
-		elseif self.position < 1 and self.mode == 3 then
+		elseif self.current_frame < 1 and self.mode == 3 then
 			self.direction = 1
-			self.position = self.position + 1
+			self.current_frame = self.current_frame + 1
 		end
 	end
 end
 
 --- Draw the animation
 function animation:draw(...)
-	love.graphics.draw(self.img, self.frames[self.position], ...)
+	love.graphics.draw(self.img, self.frames[self.current_frame], ...)
 end
 
 --- Add a frame
@@ -130,20 +130,8 @@ end
 --- Seek to a frame
 -- @param frame The frame to display now
 function animation:seek(frame)
-	self.position = frame
+	self.current_frame = frame
 	self.timer = 0
-end
-
---- Get the currently shown frame
--- @return The current frame
-function animation:getCurrentFrame()
-	return self.position
-end
-
---- Get the number of frames
--- @return The number of frames
-function animation:getSize()
-	return #self.frames
 end
 
 --- Set the delay between frames
@@ -162,13 +150,13 @@ end
 --- Get the width of the current frame
 -- @return The width of the current frame
 function animation:getWidth()
-	return self.frames[self.position]:getWidth()
+	return self.frames[self.current_frame]:getWidth()
 end
 
 --- Get the height of the current frame
 -- @return The height of the current frame
 function animation:getHeight()
-	return self.frames[self.position]:getHeight()
+	return self.frames[self.current_frame]:getHeight()
 end
 
 --- Set the play mode

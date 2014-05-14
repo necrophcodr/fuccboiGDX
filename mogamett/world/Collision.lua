@@ -29,7 +29,7 @@ local Collision = {
 
     isSensor = function(self, type1, type2)
         local collision_ignores = {}
-        for class_name, class in pairs(self.mm.classes) do
+        for class_name, class in pairs(self.mg.classes) do
             collision_ignores[class_name] = class.ignores or {}
         end
         local all = {}
@@ -53,7 +53,7 @@ local Collision = {
                 end
             end
         end
-        if self.mm.utils.table.contains(ignored_types, type2) then return true else return false end
+        if self.mg.utils.table.contains(ignored_types, type2) then return true else return false end
     end,
 
     collIsSensor = function(self, type1, type2)

@@ -4,7 +4,7 @@ local Entity = class('Entity')
 function Entity:init(world, x, y, settings)
     self.dead = false
     self.world = world
-    self.id = self.world.mm.getUID()
+    self.id = self.world.mg.getUID()
     self.x = x
     self.y = y
     if settings then
