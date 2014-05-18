@@ -5,25 +5,44 @@ function love.load()
 
     mg.init()
 
-    mg.world.camera:zoomTo(1)
-    mg.world:createEntity('Player', 400, 300, {w = 16, h = 28})
+    mg.world.camera:zoomTo(2)
+    mg.world.world:setGravity(0, 20*32)
+    mg.world:createEntity('Player', 400, 400, {w = 16, h = 28})
 
-    test = mg.Tilemap(love.graphics.newImage('tiles.png'), 32, 400, 300, {
-        {1, 0, 0, 0, 1, 1},
-        {1, 1, 0, 1, 1, 1},
-        {1, 1, 0, 1, 1, 1},
-        {0, 1, 0, 1, 1, 0},
+    tilemap = mg.Tilemap(400, 420, 32, 32, love.graphics.newImage('tiles.png'), {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     })
-
     local tile_rule = mg.utils.struct('tile', 'bit_value', 'left', 'right', 'up', 'down')
-    test:setAutoTileRules({6, 14, 12, 2, 10, 8, 7, 15, 13, 3, 11, 9}, {
-        tile_rule(13, 15, {1, 2}, {8, 9, 15}, {1, 7}, {8, 11}),
-        tile_rule(15, 15, {7, 8, 13}, {2, 3}, {3, 9}, {8, 11}),
-        tile_rule(16, 11, {4, 5}, {11, 12, 18}, {1, 7}, nil),
-        tile_rule(18, 11, {10, 11, 16}, {5, 6}, {3, 9}, nil),
-    })
-    test:autoTile()
-    mg.world:generateCollisionSolids(test)
+    tilemap:setAutoTileRules({6, 14, 12, 2, 10, 8, 7, 15, 13, 3, 11, 9})
+    tilemap:autoTile()
+    mg.world:generateCollisionSolids(tilemap)
+    mg.world:addToLayer('Default', tilemap)
+
+    bg_back = love.graphics.newImage('bg_back.png')
+    bg_mid = love.graphics.newImage('bg_mid.png')
+    mg.world:addLayer('BG1', 0.8)
+    mg.world:addToLayer('BG1', mg.Background(-320, 300, bg_back))
+    mg.world:addToLayer('BG1', mg.Background(320, 300, bg_back))
+    mg.world:addToLayer('BG1', mg.Background(960, 300, bg_back))
+    mg.world:addToLayer('BG1', mg.Background(-320, 608, bg_back))
+    mg.world:addToLayer('BG1', mg.Background(320, 608, bg_back))
+    mg.world:addToLayer('BG1', mg.Background(960, 608, bg_back))
+    mg.world:addLayer('BG2', 0.9)
+    mg.world:addToLayer('BG2', mg.Background(-320, 320, bg_mid))
+    mg.world:addToLayer('BG2', mg.Background(320, 320, bg_mid))
+    mg.world:addToLayer('BG2', mg.Background(960, 320, bg_mid))
+    mg.world:addToLayer('BG2', mg.Background(-320, 628, bg_mid))
+    mg.world:addToLayer('BG2', mg.Background(320, 628, bg_mid))
+    mg.world:addToLayer('BG2', mg.Background(960, 628, bg_mid))
+    mg.world:setLayerOrder({'BG1', 'BG2', 'Default'})
 end
 
 function love.update(dt)
@@ -32,7 +51,6 @@ end
 
 function love.draw()
     mg.draw()
-    test:draw()
 end
 
 function love.keypressed(key)

@@ -119,7 +119,7 @@ local Tilemap = {
                         local x1, y1 = findEndTile(corner.x, corner.y, direction)
                         local x2, y2 = findEndTile(corner.x, corner.y+1, direction)
                         local i = 0
-                        local move = true
+                        local move = (x2 == x1) 
                         while move and y2 < #solid_grid and solid_grid[corner.y+1+i][corner.x] ~= 100 and solid_grid[corner.y+1+i][corner.x] ~= 0 do
                             local x_, y_ = findEndTile(corner.x, corner.y+1+i, direction)
                             if x_ ~= x1 then move = false 
@@ -147,7 +147,7 @@ local Tilemap = {
                         local x1, y1 = findEndTile(corner.x, corner.y, direction)
                         local x2, y2 = findEndTile(corner.x, corner.y-1, direction)
                         local i = 0
-                        local move = true
+                        local move = (x2 == x1) 
                         while move and y2 > 1 and solid_grid[corner.y-1-i][corner.x] ~= 100 and solid_grid[corner.y-1-i][corner.x] ~= 0 do
                             local x_, y_ = findEndTile(corner.x, corner.y-1-i, direction)
                             if x_ ~= x1 then move = false
@@ -203,13 +203,19 @@ local Tilemap = {
             end
         end
 
+        local mx, my = tilemap.tile_size_x, tilemap.tile_size_y
         for _, rectangle in ipairs(rectangles) do
-            local m = tilemap.tile_size
-            local w = (tilemap.x + m*rectangle.x2 + m/2) - (tilemap.x + m*rectangle.x1 - m/2)
-            local h = (tilemap.y + m*rectangle.y2 + m/2) - (tilemap.y + m*rectangle.y1 - m/2)
-            local x = (tilemap.x + m*rectangle.x1 - m) + w/2
-            local y = (tilemap.y + m*rectangle.y1 - m) + h/2
-            self:createEntity('Solid', x, y, {body_type = 'static', w = w, h = h})
+            local ensure = function(v1, v2)
+                if v1 < v2 then return v1, v2
+                else return v2, v1 end
+            end
+            local x1, x2 = ensure(rectangle.x1, rectangle.x2)
+            local y1, y2 = ensure(rectangle.y1, rectangle.y2)
+            local w = (tilemap.x + mx*x2 + mx/2) - (tilemap.x + mx*x1 - mx/2)
+            local h = (tilemap.y + my*y2 + my/2) - (tilemap.y + my*y1 - my/2)
+            local x = (tilemap.x + mx*x1 - mx) + w/2
+            local y = (tilemap.y + my*y1 - my) + h/2
+            self:createEntity('Solid', x - tilemap.w/2, y - tilemap.h/2, {body_type = 'static', w = w, h = h})
         end
     end,
 }

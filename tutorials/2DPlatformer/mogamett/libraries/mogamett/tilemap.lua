@@ -4,13 +4,15 @@ tilemap.__index = tilemap
 local utils = require (mogamett_path .. '/libraries/mogamett/utils')
 local Vector = require (mogamett_path .. '/libraries/hump/vector')
 
-local function new(image, size, x, y, grid)
-    local t = {spritebatch = love.graphics.newSpriteBatch(image, 1000), x = x, y = y, tile_size = size, grid = grid}
+local function new(x, y, size_x, size_y, image, grid)
+    local t = {spritebatch = love.graphics.newSpriteBatch(image, 10000), x = x, y = y, tile_size_x = size_x, tile_size_y = size_y, grid = grid}
+    t.w = #grid[1]*size_x
+    t.h = #grid*size_y
 
     local quads = {}
-    for j = 1, math.floor(image:getHeight()/size) do
-        for i = 1, math.floor(image:getWidth()/size) do
-            table.insert(quads, love.graphics.newQuad((i-1)*size, (j-1)*size, size, size, image:getWidth(), image:getHeight()))
+    for j = 1, math.floor(image:getHeight()/size_y) do
+        for i = 1, math.floor(image:getWidth()/size_x) do
+            table.insert(quads, love.graphics.newQuad((i-1)*size_x, (j-1)*size_y, size_x, size_y, image:getWidth(), image:getHeight()))
         end
     end
     t.quads = quads
@@ -31,7 +33,7 @@ local function new(image, size, x, y, grid)
         t.spritebatch_id_grid[i] = {}
         for j = 1, #grid[i] do
             if grid[i][j] ~= 0 then
-                t.spritebatch_id_grid[i][j] = t.spritebatch:add(t.quads[grid[i][j]], size*(j-1) + x, size*(i-1) + y)
+                t.spritebatch_id_grid[i][j] = t.spritebatch:add(t.quads[grid[i][j]], size_x*(j-1) + x, size_y*(i-1) + y)
             end
         end
     end
@@ -42,13 +44,13 @@ local function new(image, size, x, y, grid)
     return setmetatable(t, tilemap)
 end
 
-function tilemap:changeTile(n, x, y)
+function tilemap:changeTile(x, y, n)
     if not self.quads[n] then return end
     if self.spritebatch_id_grid[x][y] then
-        self.spritebatch:set(self.spritebatch_id_grid[x][y], self.quads[n], self.tile_size*(y-1) + self.x, self.tile_size*(x-1) + self.y)
+        self.spritebatch:set(self.spritebatch_id_grid[x][y], self.quads[n], self.tile_size_x*(y-1) + self.x, self.tile_size_y*(x-1) + self.y)
         self.grid[x][y] = n
     else
-        self.spritebatch_id_grid[x][y] = self.spritebatch:add(self.quads[n], self.tile_size*(y-1) + self.x, self.tile_size*(x-1) + self.y)
+        self.spritebatch_id_grid[x][y] = self.spritebatch:add(self.quads[n], self.tile_size_x*(y-1) + self.x, self.tile_size_y*(x-1) + self.y)
         self.grid[x][y] = n
     end
 end
@@ -61,6 +63,14 @@ end
 function tilemap:setAutoTileRules(auto_tile_rules, extended_rules)
     self.auto_tile_rules = auto_tile_rules or self.auto_tile_rules
     self.extended_rules = extended_rules or self.extended_rules
+end
+
+function tilemap:setCollisionData(grid)
+    for i = 1, #grid do
+        for j = 1, #grid[i] do
+            self.solid_grid[i][j] = grid[i][j]
+        end
+    end
 end
 
 function tilemap:autoTile(auto_tile_rules, extended_rules)
@@ -104,7 +114,7 @@ function tilemap:autoTile(auto_tile_rules, extended_rules)
     for i = 1, #self.grid do
         for j = 1, #self.grid[i] do
             local n = findTileValueFromAutoTileRules(auto_tile_grid[i][j])
-            self:changeTile(n, i, j)
+            self:changeTile(i, j, n)
         end
     end
 
@@ -135,7 +145,7 @@ function tilemap:autoTile(auto_tile_rules, extended_rules)
                     end
 
                     -- Set the tile if it does
-                    if satisfied then self:changeTile(rule.tile, i, j) end
+                    if satisfied then self:changeTile(i, j, rule.tile) end
                 end
             end
         end
@@ -143,7 +153,7 @@ function tilemap:autoTile(auto_tile_rules, extended_rules)
 end
 
 function tilemap:draw()
-    love.graphics.draw(self.spritebatch, 0, 0)
+    love.graphics.draw(self.spritebatch, -self.w/2, -self.h/2)
 end
 
 return setmetatable({new = new}, {__call = function(_, ...) return new(...) end})

@@ -70,9 +70,7 @@ function World:update(dt)
 end
 
 function World:draw()
-    self:renderAttach()
     self:renderDraw()
-    self:renderDetach()
     self.camera:debugDraw()
 end
 

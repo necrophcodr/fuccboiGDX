@@ -109,7 +109,6 @@ utils.math.round = function(n, p)
     local m = math.power(10, p or 0)
     return math.floor(n*m+0.5)/m
 end
--- misc
 utils.math.chooseWithProbability = function(choices, chances)
     local r = math.random(1, 1000)
     local intervals = {}
@@ -132,6 +131,7 @@ utils.math.chooseWithProbability = function(choices, chances)
         end
     end
 end
+-- misc
 utils.angleToDirection4 = function(angle)
     local pi = math.pi
     if angle >= pi/4 then angle = -2*pi+angle end

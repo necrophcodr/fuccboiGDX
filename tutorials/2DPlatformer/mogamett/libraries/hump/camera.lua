@@ -163,8 +163,8 @@ function camera:follow(target, settings)
     local helper = 0
 
     if self.follow_style == 'lockon' then
-        w = self.target.w
-        h = self.target.h
+        w = self.target.w or 16
+        h = self.target.h or 16
         self.deadzone = {x = -w/2, y = -h/2, width = w, height = h}
     elseif self.follow_style == 'screen' then
         self.deadzone = {x = -self.game_width/2, y = -self.game_height/2, width = self.game_width, height = self.game_height}

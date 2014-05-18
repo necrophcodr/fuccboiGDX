@@ -68,6 +68,7 @@ end
 mm.World = require (mogamett_path .. '/world/World')
 
 -- entity
+mm.Background = require (mogamett_path .. '/entities/Background') 
 mm.Entity = require (mogamett_path .. '/entities/Entity')
 mm.Solid = require (mogamett_path .. '/entities/Solid')
 mm.classes['Solid'] = mm.Solid

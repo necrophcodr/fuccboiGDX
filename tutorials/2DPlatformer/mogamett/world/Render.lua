@@ -21,8 +21,8 @@ local Render = {
         end
     end,
 
-    addLayer = function(self, layer_name)
-        self.layers[layer_name] = {}
+    addLayer = function(self, layer_name, scale)
+        self.layers[layer_name] = {scale = scale or 1}
     end,
 
     addToLayer = function(self, layer_name, object)
@@ -50,10 +50,15 @@ local Render = {
     end,
 
     renderDraw = function(self)
+        local bx, by = self.camera:getPosition()
         for _, layer_name in ipairs(self.layers_order) do
+            self.camera.x = bx*self.layers[layer_name].scale
+            self.camera.y = by*self.layers[layer_name].scale
+            self:renderAttach()
             for _, object in ipairs(self.layers[layer_name]) do
                 object:draw()
             end
+            self:renderDetach()
         end
     end
 }
