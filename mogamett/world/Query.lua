@@ -75,7 +75,10 @@ local Query = {
             for _, group in ipairs(self.groups) do
                 if group.name == type then
                     for _, object in ipairs(group:getEntities()) do
-                        local _x, _y = object.body:getPosition()
+                        local _x, _y = nil, nil
+                        if object.class:includes(PhysicsBody) then
+                            _x, _y = object.body:getPosition()
+                        else _x, _y = object.x, object.y end
                         local dx, dy = math.abs(x - _x), math.abs(y - _y)
                         local distance = math.sqrt(dx*dx + dy*dy)
                         if distance < radius then 
@@ -94,7 +97,10 @@ local Query = {
             for _, group in ipairs(self.groups) do
                 if group.name == type then
                     for _, object in ipairs(group:getEntities()) do
-                        local _x, _y = object.body:getPosition()
+                        local _x, _y = nil, nil
+                        if object.class:includes(PhysicsBody) then
+                            _x, _y = object.body:getPosition()
+                        else _x, _y = object.x, object.y end
                         local dx, dy = math.abs(x - _x), math.abs(y - _y)
                         if dx <= object.w/2 + w/2 and dy <= object.h/2 + h/2 then
                             table.insert(objects, object)
@@ -136,7 +142,7 @@ local Query = {
                                 x, y = test2DLineLine(x1, y1, x2, y2, line.x1, line.y1, line.x2, line.y2)
                                 if x and y then table.insert(objects, {x = x, y = y, object = object}) end
                             end
-                        elseif object.class:includes(PhysicsCircle) then
+                        elseif object.shape_name == 'circle' then
                             local x, y = object.body:getPosition()
                             local ox1, oy1, ox2, oy2 = test2DLineCircle(x1, y1, x2, y2, x, y, object.r)
                             if ox1 and oy1 and ox2 and oy2 then

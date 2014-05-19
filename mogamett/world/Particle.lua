@@ -22,7 +22,7 @@ local Particle = {
     end,
 
     particleSpawn = function(self, name, x, y, settings)
-        local ps = {ps = self.world:_particleSpawn(name, x, y)}
+        local ps = {ps = self.world:_particleSpawn(name, x, y, settings.image)}
         if settings then
             for k, v in pairs(settings) do ps[k] = v end
         end
@@ -34,12 +34,13 @@ local Particle = {
         table.insert(self.particle_systems, ps)
     end,
 
-    _particleSpawn = function(self, name, x, y)
+    _particleSpawn = function(self, name, x, y, image)
         for i = 1, 100 do
             if not self.template_particle_systems[name][i].in_use then
                 self.template_particle_systems[name][i].name = name
                 self.template_particle_systems[name][i].in_use = true
                 self.template_particle_systems[name][i].last_get_time = love.timer.getTime()
+                self.template_particle_systems[name][i].ps:setImage(image or self.image) 
                 self.template_particle_systems[name][i].ps:setPosition(x, y)
                 self.template_particle_systems[name][i].ps:start()
                 return self.template_particle_systems[name][i]
