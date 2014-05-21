@@ -60,6 +60,7 @@ function World:update(dt)
     if self.frame_stopped then return end
     for _, group in ipairs(self.groups) do group:update(dt) end
     for _, entity in ipairs(self.entities) do entity:update(dt) end
+    self:particleUpdate(dt)
     self:renderUpdate(dt)
     self.world:update(dt)
     self:createPostWorldStep()

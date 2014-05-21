@@ -2,12 +2,14 @@ local utils = {}
 
 -- graphics
 utils.graphics = {}
+
 utils.graphics.pushRotate = function(x, y, angle)
     love.graphics.push()
     love.graphics.translate(x, y)
     love.graphics.rotate(angle or 0)
     love.graphics.translate(-x, -y)
 end
+
 utils.graphics.pushRotateScale = function(x, y, angle, scale_x, scale_y)
     love.graphics.push()
     love.graphics.translate(x, y)
@@ -46,22 +48,27 @@ function utils.graphics.roundedRectangle(mode, x, y, width, height, xround, yrou
     end
     love.graphics.polygon(mode, points)
 end
+
 -- logic
 utils.logic = {}
+
 utils.logic.equalsAny = function(v, values)
     for _, value in ipairs(values) do
         if value == v then return true end
     end
     return false
 end
+
 utils.logic.equalsAll = function(v, values)
     for _, value in ipairs(values) do
         if value ~= v then return false end
     end
     return true
 end
+
 -- table
 utils.table = {}
+
 utils.table.toString = function(t)
     local str = "{"
     for k, v in pairs(t) do
@@ -74,41 +81,49 @@ utils.table.toString = function(t)
     str = str .. "}"
     return str
 end
+
 utils.table.random = function(t)
     return t[math.random(1, #t)]
 end
+
 utils.table.contains = function(t, value)
     for k, v in pairs(t) do
         if v == value then return true end
     end
     return false
 end
+
 utils.table.copy = function(t)
     local copy
     if type(t) == 'table' then
         copy = {}
         for k, v in next, t, nil do
-            copy[table.copy(k)] = table.copy(v)
+            copy[utils.table.copy(k)] = utils.table.copy(v)
         end
-        setmetatable(copy, table.copy(getmetatable(t)))
+        setmetatable(copy, utils.table.copy(getmetatable(t)))
     else copy = t end
     return copy
 end
 -- math
 utils.math = {}
+
 utils.math.isBetween = function(v, min, max)
     return v >= min and v <= max
 end
+
 utils.math.clamp = function(v, min, max)
     return v < min and min or (v > max and max or v)
 end
+
 utils.math.random = function(min, max)
     return (min > max and (math.random()*(min - max) + max)) or (math.random()*(max - min) + min)
 end
+
 utils.math.round = function(n, p)
     local m = math.power(10, p or 0)
     return math.floor(n*m+0.5)/m
 end
+
 utils.math.chooseWithProbability = function(choices, chances)
     local r = math.random(1, 1000)
     local intervals = {}
@@ -131,6 +146,7 @@ utils.math.chooseWithProbability = function(choices, chances)
         end
     end
 end
+
 -- misc
 utils.angleToDirection4 = function(angle)
     local pi = math.pi
@@ -140,12 +156,14 @@ utils.angleToDirection4 = function(angle)
     if angle <  -3*pi/4 and angle >=  -5*pi/4 then return 'left' end
     if angle <  -5*pi/4 and angle >=  -7*pi/4 then return 'down' end
 end
+
 utils.directionToAngle4 = function(direction)
     if direction == 'right' then return 0 end
     if direction == 'up' then return -math.pi/2 end
     if direction == 'left' then return math.pi end
     if direction == 'down' then return math.pi/2 end
 end
+
 utils.findIndexById = function(t, id)
     for i, object in ipairs(t) do
         if object.id == id then 
@@ -153,6 +171,7 @@ utils.findIndexById = function(t, id)
         end
     end
 end
+
 utils.makeGrid = function(w, h)
     local grid = {}
     for i = 1, h do 
@@ -163,6 +182,7 @@ utils.makeGrid = function(w, h)
     end
     return grid
 end
+
 utils.struct = require (mogamett_path .. '/libraries/struct/struct')
 
 return utils

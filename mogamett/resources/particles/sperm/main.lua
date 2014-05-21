@@ -134,9 +134,10 @@ end
 
 function createParticleSystem(n)
     local ps = nil
+    if particle_settings[n]["buffer_size"] == 0 then particle_settings[n]["buffer_size"] = 1 end
     if blend_mode == 'premultiplied' then
-        ps = love.graphics.newParticleSystem(premultiplied_images[particle_settings[n]["image"]], particle_settings[n]["buffer_size"] or 1)
-    else ps = love.graphics.newParticleSystem(images[particle_settings[n]["image"]], particle_settings[n]["buffer_size"] or 1) end
+        ps = love.graphics.newParticleSystem(premultiplied_images[particle_settings[n]["image"]], particle_settings[n]["buffer_size"])
+    else ps = love.graphics.newParticleSystem(images[particle_settings[n]["image"]], particle_settings[n]["buffer_size"]) end
     ps:setAreaSpread(string.lower(particle_settings[n]["area_spread_distribution"]), particle_settings[n]["area_spread_dx"] or 0, particle_settings[n]["area_spread_dy"] or 0)
     ps:setBufferSize(particle_settings[n]["buffer_size"] or 1)
     local colors = {}
@@ -501,7 +502,7 @@ function createParticleFrame(n, name, x, y, w, h)
     local buffer_size = loveframes.Create('numberbox', buffer_panel)
     buffer_size:SetPos(80, 0)
     buffer_size:SetSize(70, 30)
-    buffer_size:SetMinMax(0, 9999999)
+    buffer_size:SetMinMax(1, 9999999)
     buffer_size:SetLimit(7)
     buffer_size:SetValue(1000)
     buffer_size.OnValueChanged = function(object, value) 
