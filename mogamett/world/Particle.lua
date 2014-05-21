@@ -55,9 +55,9 @@ local Particle = {
                 self.particle_systems[i].ps.ps:update(dt)
             end
 
-            if self.particle_systems[i].parent then
-                if not self.particle_systems[i].parent.dead then
-                    self.particle_systems[i].ps.ps:setPosition(self.particle_systems[i].parent.x, self.particle_systems[i].parent.y)
+            if self.particle_systems[i].follow_target then
+                if not self.particle_systems[i].follow_target.dead then
+                    self.particle_systems[i].ps.ps:setPosition(self.particle_systems[i].follow_target.x, self.particle_systems[i].follow_target.y)
                 end
             end
 

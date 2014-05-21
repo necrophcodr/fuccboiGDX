@@ -16,35 +16,35 @@ local Particle = {
             self.template_particle_systems[name] = {}
             for i = 1, 100 do 
                 table.insert(self.template_particle_systems[name], 
-                            {id = getUID(), name = name, last_get_time = 0, in_use = false, ps = self:_getPS(name)}) 
+                            {id = self.mg.getUID(), name = name, last_get_time = 0, in_use = false, ps = self:_getPS(name)}) 
             end
         end
     end,
 
-    particleSpawn = function(self, name, x, y, settings)
-        local ps = {ps = self.world:_particleSpawn(name, x, y)}
-        if settings then
-            for k, v in pairs(settings) do ps[k] = v end
-        end
-        ps.draw = function()
-            local x, y = ps.ps.ps:getPosition()
-            love.graphics.draw(ps.ps.ps, 0, 0) 
-        end
-        self:addToLayer(settings.layer, ps)
-        table.insert(self.particle_systems, ps)
-    end,
-
-    _particleSpawn = function(self, name, x, y)
+    _particleSpawn = function(self, name, x, y, image)
         for i = 1, 100 do
             if not self.template_particle_systems[name][i].in_use then
                 self.template_particle_systems[name][i].name = name
                 self.template_particle_systems[name][i].in_use = true
                 self.template_particle_systems[name][i].last_get_time = love.timer.getTime()
+                self.template_particle_systems[name][i].ps:setImage(image or self.image) 
                 self.template_particle_systems[name][i].ps:setPosition(x, y)
                 self.template_particle_systems[name][i].ps:start()
                 return self.template_particle_systems[name][i]
             end
         end
+    end,
+
+    spawnParticles = function(self, name, x, y, settings)
+        settings = settings or {}
+        local ps = {ps = self:_particleSpawn(name, x, y, settings.image)}
+        for k, v in pairs(settings) do ps[k] = v end
+        ps.draw = function(ps)
+            local x, y = ps.ps.ps:getPosition()
+            love.graphics.draw(ps.ps.ps, 0, 0) 
+        end
+        self:addToLayer(settings.layer or 'Default', ps)
+        table.insert(self.particle_systems, ps)
     end,
 
     particleUpdate = function(self, dt)
@@ -55,9 +55,9 @@ local Particle = {
                 self.particle_systems[i].ps.ps:update(dt)
             end
 
-            if self.particle_systems[i].parent then
-                if not self.particle_systems[i].parent.dead then
-                    self.particle_systems[i].ps.ps:setPosition(self.particle_systems[i].parent.x, self.particle_systems[i].parent.y)
+            if self.particle_systems[i].follow_target then
+                if not self.particle_systems[i].follow_target.dead then
+                    self.particle_systems[i].ps.ps:setPosition(self.particle_systems[i].follow_target.x, self.particle_systems[i].follow_target.y)
                 end
             end
 
@@ -91,10 +91,7 @@ local Particle = {
     end,
 
     particleDraw = function(self)
-        for _, ps in ipairs(self.particle_systems) do
-            local x, y = ps.ps.ps:getPosition()
-            love.graphics.draw(ps.ps.ps, 0, 0) 
-        end
+
     end,
 
     _getPS = function(self, name)

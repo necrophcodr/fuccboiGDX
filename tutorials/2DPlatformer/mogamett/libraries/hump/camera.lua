@@ -186,10 +186,10 @@ function camera:updateFollow(dt)
     else
         local edge = 0
         if self.follow_style == 'screen' then
-            if self.target.x > (self.x + self.game_width/2) then self.scroll_target.x = self.scroll_target.x + self.game_width
-            elseif self.target.x < (self.x  - self.game_width/2) then self.scroll_target.x = self.scroll_target.x - self.game_width
-            elseif self.target.y > (self.y + self.game_height/2) then self.scroll_target.y = self.scroll_target.y + self.game_height
-            elseif self.target.y < (self.y - self.game_height/2) then self.scroll_target.y = self.scroll_target.y - self.game_height end
+            if self.target.x > (self.x + self.deadzone.width/2) then self.scroll_target.x = self.scroll_target.x + self.deadzone.width
+            elseif self.target.x < (self.x  - self.deadzone.width/2) then self.scroll_target.x = self.scroll_target.x - self.deadzone.width
+            elseif self.target.y > (self.y + self.deadzone.height/2) then self.scroll_target.y = self.scroll_target.y + self.deadzone.height
+            elseif self.target.y < (self.y - self.deadzone.height/2) then self.scroll_target.y = self.scroll_target.y - self.deadzone.height end
         else
             edge = self.target.x - self.deadzone.x
             if self.scroll_target.x > edge then self.scroll_target.x = edge end
@@ -220,12 +220,8 @@ function camera:update(dt)
     self:setGameSize()
     if self.target then self:updateFollow(dt) end
     if self.bounds then
-        local camera_left, camera_top = self:getWorldCoords(self.x - self.game_width/2, self.y - self.game_height/2)
-        local camera_right, camera_bottom = self:getWorldCoords(self.x + self.game_width/2, self.y + self.game_height/2)
-        local left = utils.math.clamp(camera_left, self.bounds.left, self.bounds.right)
-        local right = utils.math.clamp(camera_right, self.bounds.left, self.bounds.right)
-        local top = utils.math.clamp(camera_top, self.bounds.top, self.bounds.down)
-        local bottom = utils.math.clamp(camera_bottom, self.bounds.top, self.bounds.down)
+        local left, top = self.x + self.game_width/2, self.y + self.game_height/2
+        local right, down = self.x - self.game_width/2, self.y - self.game_height/2
         self.x = utils.math.clamp(self.x, left, right)
         self.y = utils.math.clamp(self.y, top, bottom)
     end
