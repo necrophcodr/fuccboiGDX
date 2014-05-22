@@ -69,9 +69,9 @@ local Particle = {
             local lifetime = self.particle_systems[i].ps.ps:getEmitterLifetime()
             if lifetime > 0 then
                 local t = love.timer.getTime() - self.particle_systems[i].ps.last_get_time
-                if t > lifetime then self.particle_systems[i].ps.ps:stop() end
-                if t > 3*lifetime then
-                    self.world:particleFree(self.particle_systems[i].ps.name, self.particle_systems[i].ps.id)
+                -- if t > lifetime then self.particle_systems[i].ps.ps:stop() end
+                if t > 10*lifetime then
+                    self:_particleFree(self.particle_systems[i].ps.name, self.particle_systems[i].ps.id)
                     table.remove(self.particle_systems, i) 
                 end
             end

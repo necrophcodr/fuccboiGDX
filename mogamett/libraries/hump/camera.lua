@@ -102,7 +102,7 @@ function camera:shake(intensity, duration, settings)
     settings = settings or {}
     self.shake_uid = self.shake_uid + 1
     table.insert(self.shakes, {creation_time = love.timer.getTime(), id = self.uid, intensity = intensity, duration = duration,
-                               direction = string.lower(settings.direction) or 'both'})
+                               direction = string.lower(settings.direction or 'both')})
 end
 
 function camera:shakeRemove(id)
@@ -220,10 +220,14 @@ function camera:update(dt)
     self:setGameSize()
     if self.target then self:updateFollow(dt) end
     if self.bounds then
-        local left, top = self.x + self.game_width/2, self.y + self.game_height/2
-        local right, down = self.x - self.game_width/2, self.y - self.game_height/2
-        self.x = utils.math.clamp(self.x, left, right)
-        self.y = utils.math.clamp(self.y, top, bottom)
+        local left, top = self.x - self.game_width/2, self.y - self.game_height/2
+        local right, down = self.x + self.game_width/2, self.y + self.game_height/2
+        left = utils.math.clamp(left, self.bounds.left, self.bounds.right)
+        right = utils.math.clamp(right, self.bounds.left, self.bounds.right)
+        top = utils.math.clamp(top, self.bounds.top, self.bounds.down)
+        down = utils.math.clamp(down, self.bounds.top, self.bounds.down)
+        self.x = utils.math.clamp(self.x, left + self.game_width/2, right - self.game_width/2)
+        self.y = utils.math.clamp(self.y, top + self.game_height/2, down - self.game_height/2)
     end
     self:updateShake(dt)
 end

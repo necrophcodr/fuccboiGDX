@@ -2,7 +2,7 @@ require("loveframes")
 
 function love.load()
     -- YOUR SAVE FOLDER HERE
-    save_folder = "C:/Users/Waffles/dev/mogamett/mogamett/resources/particles/sperm/"
+    save_folder = "C:/Users/Waffles/dev/mogamett/tutorials/Pong/mogamett/resources/particles/sperm/"
 
     images = {}
     premultiplied_images = {}

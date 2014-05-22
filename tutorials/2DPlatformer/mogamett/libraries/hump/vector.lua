@@ -25,7 +25,7 @@ THE SOFTWARE.
 ]]--
 
 local assert = assert
-local sqrt, cos, sin, atan2 = math.sqrt, math.cos, math.sin, math.atan2
+local sqrt, cos, sin, atan, atan2 = math.sqrt, math.cos, math.sin, math.atan, math.atan2
 
 local vector = {}
 vector.__index = vector
@@ -172,6 +172,10 @@ function vector:trimInplace(maxLen)
 	s = s < 1 and 1 or math.sqrt(s)
 	self.x, self.y = self.x * s, self.y * s
 	return self
+end
+
+function vector:angle()
+    return atan(self.y, self.x)
 end
 
 function vector:angleTo(other)
