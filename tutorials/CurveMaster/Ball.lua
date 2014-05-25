@@ -61,7 +61,8 @@ function Ball:update(dt)
         if (self.x - self.r/2 <= paddle1.x + paddle1.w/2) and (self.y >= paddle1.y - paddle1.h/2) and (self.y <= paddle1.y + paddle1.h/2) then
             camera:shake(5, 0.5)
             mg.world:spawnParticles('hit', paddle1.x + paddle1.w/2, self.y, {rotation = 0})
-            self.v.x = -(1.07 + 0.01*level)*self.v.x 
+            self.v.x = (1.07 + 0.01*level)*self.v.x 
+            self.angle = math.pi - self.angle
             self.rotation_speed = paddle1.v/4
             self.angle_speed = paddle1.v/96
             mg.timer:cancel('r_speed_add')
@@ -74,7 +75,8 @@ function Ball:update(dt)
         if (self.x + self.r/2 >= paddle2.x - paddle2.w/2) and (self.y >= paddle2.y - paddle2.h/2) and (self.y <= paddle2.y + paddle2.h/2) then
             camera:shake(5, 0.5)
             mg.world:spawnParticles('hit', paddle2.x - paddle2.w/2, self.y, {rotation = math.pi})
-            self.v.x = -(1.07 + 0.01*level)*self.v.x 
+            self.v.x = (1.07 + 0.01*level)*self.v.x 
+            self.angle = math.pi - self.angle
             self.rotation_speed = paddle2.v/4
             self.angle_speed = paddle2.v/96
             mg.timer:cancel('r_speed_add')

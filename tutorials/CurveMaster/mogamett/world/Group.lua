@@ -29,14 +29,15 @@ function Group:add(entity)
 end
 
 function Group:remove(id)
-    table.remove(self.entities, utils.findIndexByID(self.entities, id))
+    local fid = utils.findIndexById(self.entities, id)
+    if fid then table.remove(self.entities, fid) end
 end
 
 function Group:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
             if self.entities[i].timer then self.entities[i].timer:destroy() end
-            if self.entities[i].class:includes(PhysicsBody) then 
+            if self.entities[i].class:includes(self.entities[i].world.mg.PhysicsBody) then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
                 if self.entities[i].body then self.entities[i].body:destroy() end
@@ -44,8 +45,10 @@ function Group:removePostWorldStep()
                 self.entities[i].sensor = nil
                 self.entities[i].body = nil
             end
-            self.entities[i].world = nil
-            self:remove(self.entities[i].id)
+            self.entities[i].world:removeFromRender(self.entities[i].id)
+            table.remove(self.entities, i)
+            -- self.entities[i].world = nil
+            -- self:remove(self.entities[i].id)
         end
     end
 end

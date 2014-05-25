@@ -19,7 +19,7 @@ local Factory = {
             if o.type then entity = self.mg.classes[o.type](self, o.x, o.y, o.settings) end
             if entity then
                 self:addToGroup(o.type, entity)
-                self:addToLayer(self.mg.classes.layer or 'Default', entity)
+                self:addToLayer(self.mg.classes[o.type].layer or 'Default', entity)
             end
         end
         self.to_be_created = {}

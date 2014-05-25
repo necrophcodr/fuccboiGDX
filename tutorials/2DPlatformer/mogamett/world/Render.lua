@@ -30,15 +30,24 @@ local Render = {
         if self.layers[layer_name] then table.insert(self.layers[layer_name], object) end
     end,
 
+    removeFromRender = function(self, id)
+        for layer_name, layer in pairs(self.layers) do
+            local fid = self.mg.utils.findIndexById(layer, id)
+            if fid then table.remove(layer, fid); return end
+        end
+    end,
+
     renderUpdate = function(self, dt)
         self.camera:update(dt)
 
+        --[[
         -- Clear dead objects from layers
         for layer_name, layer in pairs(self.layers) do
             for i = #self.layers[layer_name], 1, -1 do
-                if self.layers[layer_name][i].dead then table.remove(self.layers[layer_name], i) end
+                if self.layers[layer_name][i].dead then print(i); table.remove(self.layers[layer_name], i) end
             end
         end
+        ]]--
     end,
 
     renderAttach = function(self)

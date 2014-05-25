@@ -65,9 +65,7 @@ function World:update(dt)
     self.world:update(dt)
     self:createPostWorldStep()
     self:removePostWorldStep()
-    for _, group in ipairs(self.groups) do 
-        group:removePostWorldStep() 
-    end
+    for _, group in ipairs(self.groups) do group:removePostWorldStep() end
 end
 
 function World:draw()
@@ -133,7 +131,7 @@ function World:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
             if self.entities[i].timer then self.entities[i].timer:destroy() end
-            if self.entities[i].class:includes(PhysicsBody) then 
+            if self.entities[i].class:includes(self.mg.PhysicsBody) then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
                 if self.entities[i].body then self.entities[i].body:destroy() end
@@ -141,7 +139,8 @@ function World:removePostWorldStep()
                 self.entities[i].sensor = nil
                 self.entities[i].body = nil
             end
-            self.entities[i].world = nil
+            -- self.entities[i].world = nil
+            table.remove(self.entities, self.mg.utils.findIndexById(self.entities[i].id))
         end
     end
 end

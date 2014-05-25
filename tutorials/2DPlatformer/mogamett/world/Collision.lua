@@ -144,7 +144,7 @@ local Collision = {
     collisionOnEnter = function(fixture_a, fixture_b, contact)
         local a, b = fixture_a:getUserData(), fixture_b:getUserData()
         local nx, ny = contact:getNormal()
-        
+
         if fixture_a:isSensor() and fixture_b:isSensor() then
             if a and b then
                 for _, collision in ipairs(a.world.collisions.on_enter.sensor) do
