@@ -12,6 +12,7 @@ mm.Vector = require (mogamett_path .. '/libraries/hump/vector')
 mm.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
 
 mm.Tilemap = require (mogamett_path .. '/libraries/mogamett/tilemap')
+mg.Text = require (mogamett_path .. '/libraries/mogamett/text')
 
 -- Group
 mm.Group = require (mogamett_path .. '/world/Group')

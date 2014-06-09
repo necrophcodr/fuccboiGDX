@@ -379,7 +379,6 @@ function Text.new(text, settings)
                 str = ""
             end
         end
-        if i == 1 then str = "" end
         local text_w = self.font:getWidth(str)
         
         -- Move to new line if over wrap_width
@@ -391,8 +390,9 @@ function Text.new(text, settings)
             end
         end
         text_w = self.font:getWidth(str)
+        local w = self.font:getWidth(c)
 
-        local char_struct = {position = i, character = c, text = stripped_text, x = text_w, 
+        local char_struct = {position = i, character = c, text = self, str_text = stripped_text, x = text_w - w/2, 
                              y = 0 + line*(self.line_height or 1)*self.font:getHeight(),
                              modifiers = modifiers, line = line, pivot = {x = 0, y = 0}}
         table.insert(self.characters, char_struct)
