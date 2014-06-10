@@ -1,6 +1,5 @@
-local Class = require (mogamett_path .. '/libraries/classic/classic')
 local Entity = require(mogamett_path .. '/entities/Entity')
-local Solid = Entity:extend()
+local Solid = Entity:extend('Solid')
 local PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
 Solid:implement(PhysicsBody)
 
