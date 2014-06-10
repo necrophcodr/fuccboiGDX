@@ -9,6 +9,11 @@ local function new(x, y, size_x, size_y, image, grid)
     t.w = #grid[1]*size_x
     t.h = #grid*size_y
 
+    t.x1 = x - size_x*#grid[1]/2
+    t.y1 = y - size_y*#grid/2
+    t.x2 = x + size_x*#grid[1]/2
+    t.y2 = y + size_y*#grid/2
+
     local quads = {}
     for j = 1, math.floor(image:getHeight()/size_y) do
         for i = 1, math.floor(image:getWidth()/size_x) do
