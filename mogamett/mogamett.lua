@@ -12,17 +12,18 @@ mm.Vector = require (mogamett_path .. '/libraries/hump/vector')
 mm.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
 
 mm.Tilemap = require (mogamett_path .. '/libraries/mogamett/tilemap')
-mg.Text = require (mogamett_path .. '/libraries/mogamett/text')
+mm.Text = require (mogamett_path .. '/libraries/mogamett/text')
 
 -- Group
 mm.Group = require (mogamett_path .. '/world/Group')
 
 -- middleclass 
-mm.Class = require (mogamett_path .. '/libraries/middleclass/middleclass')
+mm.Class = require (mogamett_path .. '/libraries/classic/classic')
 -- holds all classes created with the mm.class call
 mm.classes = {}
 mm.class = function(class_name, ...)
-    mm.classes[class_name] = mm.Class(class_name, ...)
+    local args = {...}
+    mm.classes[class_name] = mm[args[1]]:extend(class_name)
     return mm.classes[class_name]
 end
 

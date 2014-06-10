@@ -1,7 +1,7 @@
-local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
-local Entity = class('Entity')
+local Class = require (mogamett_path .. '/libraries/classic/classic')
+local Entity = Class:extend() 
 
-function Entity:init(world, x, y, settings)
+function Entity:new(world, x, y, settings)
     self.dead = false
     self.world = world
     self.id = self.world.mg.getUID()

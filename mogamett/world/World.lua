@@ -7,26 +7,26 @@ local Query = require (mogamett_path .. '/world/Query')
 local Particle = require (mogamett_path .. '/world/Particle')
 local Tilemap = require (mogamett_path .. '/world/Tilemap')
 
-local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
-local World = class('World')
-World:include(Collision)
-World:include(Render)
-World:include(Factory)
-World:include(Query)
-World:include(HitFrameStop)
-World:include(Particle)
-World:include(Tilemap)
+local Class = require (mogamett_path .. '/libraries/classic/classic')
+local World = Class:extend()
+World:implement(Collision)
+World:implement(Render)
+World:implement(Factory)
+World:implement(Query)
+World:implement(HitFrameStop)
+World:implement(Particle)
+World:implement(Tilemap)
 
-function World:init(mg)
+function World:new(mg)
     self.mg = mg
     self.id = self.mg.getUID()
-    self:collisionInit()
-    self:renderInit()
-    self:factoryInit()
-    self:queryInit()
-    self:hitFrameStopInit()
-    self:particleInit()
-    self:tilemapInit()
+    self:collisionNew()
+    self:renderNew()
+    self:factoryNew()
+    self:queryNew()
+    self:hitFrameStopNew()
+    self:particleNew()
+    self:tilemapNew()
     love.physics.setMeter(32)
     self.world = love.physics.newWorld(0, 0) 
     self.world:setCallbacks(self.collisionOnEnter, self.collisionOnExit, self.collisionPre, self.collisionPost)
@@ -131,7 +131,7 @@ function World:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
             if self.entities[i].timer then self.entities[i].timer:destroy() end
-            if self.entities[i].class:includes(self.mg.PhysicsBody) then 
+            if self.entities[i].body:type() == 'Body' then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
                 if self.entities[i].body then self.entities[i].body:destroy() end

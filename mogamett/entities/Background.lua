@@ -1,7 +1,7 @@
-local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
-local Background = class('Background')
+local Class = require (mogamett_path .. '/libraries/classic/classic')
+local Background = Class:extend()
 
-function Background:init(x, y, image)
+function Background:new(x, y, image)
     self.image = image
     self.w = image:getWidth()
     self.h = image:getHeight()

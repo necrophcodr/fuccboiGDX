@@ -1,12 +1,12 @@
-local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
+local Class = require (mogamett_path .. '/libraries/classic/classic')
 local Entity = require(mogamett_path .. '/entities/Entity')
-local Solid = class('Solid', Entity)
+local Solid = Entity:extend()
 local PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
-Solid:include(PhysicsBody)
+Solid:implement(PhysicsBody)
 
-function Solid:init(world, x, y, settings)
-    Entity.init(self, world, x, y, settings)
-    self:physicsBodyInit(world, x, y, settings)
+function Solid:new(world, x, y, settings)
+    Solid.super.new(self, world, x, y, settings)
+    self:physicsBodyNew(world, x, y, settings)
 end
 
 function Solid:update(dt)

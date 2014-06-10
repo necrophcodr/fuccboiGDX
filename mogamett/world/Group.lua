@@ -1,9 +1,9 @@
-local class = require (mogamett_path .. '/libraries/middleclass/middleclass')
-local Group = class('Group')
+local Class = require (mogamett_path .. '/libraries/classic/classic')
+local Group = Class:extend()
 
 local utils = require (mogamett_path .. '/libraries/mogamett/utils')
 
-function Group:init(name)
+function Group:new(name)
     self.name = name
     self.entities = {}
 end
@@ -37,7 +37,7 @@ function Group:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
             if self.entities[i].timer then self.entities[i].timer:destroy() end
-            if self.entities[i].class:includes(self.entities[i].world.mg.PhysicsBody) then 
+            if self.entities[i].body:type() == 'Body' then 
                 if self.entities[i].fixture then self.entities[i].fixture:setUserData(nil) end
                 if self.entities[i].sensor then self.entities[i].sensor:setUserData(nil) end
                 if self.entities[i].body then self.entities[i].body:destroy() end
