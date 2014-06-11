@@ -7,6 +7,7 @@ mm.Timer = require (mogamett_path .. '/libraries/mogamett/timer')
 mm.timer = mm.Timer.new()
 mm.Camera = require (mogamett_path .. '/libraries/hump/camera')
 mm.Vector = require (mogamett_path .. '/libraries/hump/vector')
+mm.Gamestate = require (mogamett_path .. '/libraries/hump/gamestate')
 
 -- AnAL
 mm.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
@@ -17,7 +18,6 @@ mm.Text = require (mogamett_path .. '/libraries/mogamett/text')
 -- Group
 mm.Group = require (mogamett_path .. '/world/Group')
 
--- middleclass 
 mm.Class = require (mogamett_path .. '/libraries/classic/classic')
 -- holds all classes created with the mm.class call
 mm.classes = {}
@@ -26,6 +26,10 @@ mm.class = function(class_name, ...)
     mm.classes[class_name] = mm[args[1]]:extend(class_name)
     return mm.classes[class_name]
 end
+
+-- love-loader
+mm.Assets = {}
+mm.Loader = require (mogamett_path .. '/libraries/love-loader/love-loader')
 
 -- lovebird
 mm.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')

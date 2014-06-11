@@ -4,7 +4,7 @@ tilemap.__index = tilemap
 local utils = require (mogamett_path .. '/libraries/mogamett/utils')
 local Vector = require (mogamett_path .. '/libraries/hump/vector')
 
-local function new(x, y, size_x, size_y, image, grid)
+local function new(x, y, size_x, size_y, image, grid, settings)
     local t = {spritebatch = love.graphics.newSpriteBatch(image, 10000), x = x, y = y, tile_size_x = size_x, tile_size_y = size_y, grid = grid}
     t.w = #grid[1]*size_x
     t.h = #grid*size_y
@@ -14,10 +14,13 @@ local function new(x, y, size_x, size_y, image, grid)
     t.x2 = x + size_x*#grid[1]/2
     t.y2 = y + size_y*#grid/2
 
+    settings = settings or {}
+    t.padding = settings.padding or 0
+
     local quads = {}
     for j = 1, math.floor(image:getHeight()/size_y) do
         for i = 1, math.floor(image:getWidth()/size_x) do
-            table.insert(quads, love.graphics.newQuad((i-1)*size_x, (j-1)*size_y, size_x, size_y, image:getWidth(), image:getHeight()))
+            table.insert(quads, love.graphics.newQuad((i-1)*size_x + t.padding*(i-1), (j-1)*size_y + t.padding*(j-1), size_x, size_y, image:getWidth(), image:getHeight()))
         end
     end
     t.quads = quads
