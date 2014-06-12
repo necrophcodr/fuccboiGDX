@@ -75,7 +75,6 @@ function Collision:addCollisionExit(type1, type2, action, physical)
     else table.insert(self.collisions.on_exit.sensor, {type1 = type1, type2 = type2, action = action}) end
 end
 
-
 function Collision:addCollisionPre(type1, type2, action, physical)
     if not self:collIsSensor(type1, type2) or physical then
         table.insert(self.collisions.pre.non_sensor, {type1 = type1, type2 = type2, action = action})
@@ -97,9 +96,9 @@ function Collision.collisionPre(fixture_a, fixture_b, contact)
             for _, collision in ipairs(a.object.world.collisions.pre.sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'pre', b.object, contact)
+                    a.object[collision.action](a.object, 'pre', b, contact)
                     if collision.type1 == collision.type2 then 
-                        b.object[collision.action](b.object, 'pre', a.object, contact) 
+                        b.object[collision.action](b.object, 'pre', a, contact) 
                     end
                 end
             end
@@ -110,9 +109,9 @@ function Collision.collisionPre(fixture_a, fixture_b, contact)
             for _, collision in ipairs(a.object.world.collisions.pre.non_sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'pre', b.object, contact)
+                    a.object[collision.action](a.object, 'pre', b, contact)
                     if collision.type1 == collision.type2 then 
-                        b.object[collision.action](b.object, 'pre', a.object, contact) 
+                        b.object[collision.action](b.object, 'pre', a, contact) 
                     end
                 end
             end
@@ -129,9 +128,9 @@ function Collision.collisionPost(fixture_a, fixture_b, contact, ni1, ti1, ni2, t
             for _, collision in ipairs(a.object.world.collisions.post.sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'post', b.object, contact, ni1, ti1, ni2, ti2)
+                    a.object[collision.action](a.object, 'post', b, contact, ni1, ti1, ni2, ti2)
                     if collision.type1 == collision.type2 then 
-                        b.object[collision.action](b.object, 'post', a.object, contact, ni1, ti2, ni2, ti2) 
+                        b.object[collision.action](b.object, 'post', a, contact, ni1, ti2, ni2, ti2) 
                     end
                 end
             end
@@ -142,9 +141,9 @@ function Collision.collisionPost(fixture_a, fixture_b, contact, ni1, ti1, ni2, t
             for _, collision in ipairs(a.object.world.collisions.post.non_sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'post', b.object, contact, ni1, ti1, ni2, ti2)
+                    a.object[collision.action](a.object, 'post', b, contact, ni1, ti1, ni2, ti2)
                     if collision.type1 == collision.type2 then 
-                        b[collision.action](b.object, 'post', a.object, contact, ni1, ti2, ni2, ti2) 
+                        b[collision.action](b.object, 'post', a, contact, ni1, ti2, ni2, ti2) 
                     end
                 end
             end
@@ -161,9 +160,9 @@ function Collision.collisionOnEnter(fixture_a, fixture_b, contact)
             for _, collision in ipairs(a.object.world.collisions.on_enter.sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'enter', b.object, contact)
+                    a.object[collision.action](a.object, 'enter', b, contact)
                     if collision.type1 == collision.type2 then 
-                        b.object[collision.action](b.object, 'enter', a.object, contact) 
+                        b.object[collision.action](b.object, 'enter', a, contact) 
                     end
                 end
             end
@@ -174,9 +173,9 @@ function Collision.collisionOnEnter(fixture_a, fixture_b, contact)
             for _, collision in ipairs(a.object.world.collisions.on_enter.non_sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'enter', b.object, contact)
+                    a.object[collision.action](a.object, 'enter', b, contact)
                     if collision.type1 == collision.type2 then 
-                        b.object[collision.action](b.object, 'enter', a.object, contact) 
+                        b.object[collision.action](b.object, 'enter', a, contact) 
                     end
                 end
             end
@@ -193,9 +192,9 @@ function Collision.collisionOnExit(fixture_a, fixture_b, contact)
             for _, collision in ipairs(a.object.world.collisions.on_exit.sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'exit', b.object, contact)
+                    a.object[collision.action](a.object, 'exit', b, contact)
                     if collision.type1 == collision.type2 then 
-                        b.object[collision.action](b.object, 'exit', a.object, contact) 
+                        b.object[collision.action](b.object, 'exit', a, contact) 
                     end
                 end
             end
@@ -206,9 +205,9 @@ function Collision.collisionOnExit(fixture_a, fixture_b, contact)
             for _, collision in ipairs(a.object.world.collisions.on_exit.non_sensor) do
                 if collIf(collision.type1, collision.type2, a, b) then
                     a, b = collEnsure(collision.type1, a, collision.type2, b)
-                    a.object[collision.action](a.object, 'exit', b.object, contact)
+                    a.object[collision.action](a.object, 'exit', b, contact)
                     if collision.type1 == collision.type2 then 
-                        b.object[collision.action](b.object, 'exit', a.object, contact) 
+                        b.object[collision.action](b.object, 'exit', a, contact) 
                     end
                 end
             end

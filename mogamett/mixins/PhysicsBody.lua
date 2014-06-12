@@ -82,7 +82,12 @@ function PhysicsBody:addJoint(type, ...)
         revolute = 'newRevoluteJoint', rope = 'newRopeJoint', weld = 'newWeldJoint', wheel = 'newWheelJoint',
     }
     joint = love.physics[joint_name_to_function_name[joint_name]](unpack(args))
-    table.insert(joint, joints)
+    table.insert(self.joints, joint)
+end
+
+function PhysicsBody:removeJoint(n)
+    self.joints[n]:destroy()
+    table.remove(self.joints, n)
 end
 
 function PhysicsBody:physicsBodyUpdate(dt)
@@ -113,6 +118,17 @@ function PhysicsBody:physicsBodyDraw()
             love.graphics.circle('line', x, y, self.r, 360)
             love.graphics.setColor(255, 255, 255)
         end
+    end
+
+    for i = 1, #self.joints do
+        local x1, y1, x2, y2 = self.joints[i]:getAnchors()
+        love.graphics.setPointSize(8)
+        love.graphics.setColor(244, 128, 64)
+        love.graphics.point(x1, y1)
+        love.graphics.setColor(128, 244, 64)
+        love.graphics.point(x2, y2)
+        love.graphics.setColor(255, 255, 255)
+        love.graphics.setPointSize(1)
     end
 end
 
