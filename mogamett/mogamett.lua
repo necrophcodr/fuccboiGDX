@@ -61,6 +61,10 @@ mm.lovebird_enabled = false
 mm.game_width = love.window.getWidth()
 mm.game_height = love.window.getHeight()
 
+mm.addCollisionClass = function(class_name, ignores)
+    mm.classes[class_name] = {ignores = ignores}
+end
+
 -- init
 mm.init = function()
     love.graphics.setDefaultFilter('nearest', 'nearest')

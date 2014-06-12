@@ -1,5 +1,5 @@
 local Class = require (mogamett_path .. '/libraries/classic/classic')
-local Entity = Class:extend() 
+local Entity = Class:extend('Entity') 
 
 function Entity:new(world, x, y, settings)
     self.dead = false

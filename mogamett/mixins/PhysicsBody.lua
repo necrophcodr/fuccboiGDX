@@ -2,41 +2,87 @@ local Class = require (mogamett_path .. '/libraries/classic/classic')
 local PhysicsBody = Class:extend()  
 
 function PhysicsBody:physicsBodyNew(world, x, y, settings)
+    self.bodies = {}
+    self.shapes = {}
+    self.fixtures = {}
+    self.sensors = {}
+    self.joints = {}
+
+    self:addBody(world, x, y, settings)
+end
+
+function PhysicsBody:addBody(world, x, y, settings)
     settings = settings or {}
-    self.body = love.physics.newBody(world.world, x, y, settings.body_type or 'dynamic')
-    self.body:setFixedRotation(true)
+
+    local body = love.physics.newBody(world.world, x, y, settings.body_type or 'dynamic')
+    body:setFixedRotation(true)
+
     settings.shape = settings.shape or 'rectangle'
-    self.shape_name = string.lower(settings.shape)
-    if self.shape_name == 'bsgrectangle' then
+    local shape = nil
+    local shape_name = string.lower(settings.shape)
+    local body_w, body_h, body_r = 0, 0, 0
+
+    if shape_name == 'bsgrectangle' then
         local w, h, s = settings.w or 32, settings.h or 32, settings.s or 4
-        self.w, self.h = w, h
-        self.shape = love.physics.newPolygonShape(
+        body_w, body_h = w, h
+        shape = love.physics.newPolygonShape(
             -w/2, -h/2 + s, -w/2 + s, -h/2,
              w/2 - s, -h/2, w/2, -h/2 + s,
              w/2, h/2 - s, w/2 - s, h/2,
             -w/2 + s, h/2, -w/2, h/2 - s
         )
-    elseif self.shape_name == 'rectangle' then
-        self.w, self.h = settings.w or 32, settings.h or 32
-        self.shape = love.physics.newRectangleShape(settings.w or 32, settings.h or 32)
-    elseif self.shape_name == 'polygon' then
-        self.shape = love.physics.newPolygonShape(unpack(settings.vertices))
-    elseif self.shape_name == 'chain' then
-        self.shape = love.physics.newChainShape(settings.loop or false, unpack(settings.vertices))
-    elseif self.shape_name == 'circle' then
-        self.r = settings.r or 16
-        self.w, self.h = settings.r or 32, settings.r or 32
-        self.shape = love.physics.newCircleShape(settings.r or 16)
+
+    elseif shape_name == 'rectangle' then
+        body_w, body_h = settings.w or 32, settings.h or 32
+        shape = love.physics.newRectangleShape(settings.w or 32, settings.h or 32)
+
+    elseif shape_name == 'polygon' then
+        shape = love.physics.newPolygonShape(unpack(settings.vertices))
+
+    elseif shape_name == 'chain' then
+        shape = love.physics.newChainShape(settings.loop or false, unpack(settings.vertices))
+
+    elseif shape_name == 'circle' then
+        body_r = settings.r or 16
+        body_w, body_h = settings.r or 32, settings.r or 32
+        shape = love.physics.newCircleShape(settings.r or 16)
     end
 
-    local name = settings.other or self.class_name
-    self.fixture = love.physics.newFixture(self.body, self.shape)
-    self.fixture:setCategory(unpack(self.world.mg.Collision.masks[self.class_name].categories))
-    self.fixture:setMask(unpack(self.world.mg.Collision.masks[self.class_name].masks))
-    self.fixture:setUserData(self)
-    self.sensor = love.physics.newFixture(self.body, self.shape)
-    self.sensor:setSensor(true)
-    self.sensor:setUserData(self)
+    local mask_name = settings.collision_class or self.class_name
+    local fixture = love.physics.newFixture(body, shape)
+    fixture:setCategory(unpack(self.world.mg.Collision.masks[mask_name].categories))
+    fixture:setMask(unpack(self.world.mg.Collision.masks[mask_name].masks))
+    fixture:setUserData({object = self, mask_name = mask_name})
+    local sensor = love.physics.newFixture(body, shape)
+    sensor:setSensor(true)
+    sensor:setUserData({object = self, mask_name = mask_name})
+
+    table.insert(self.bodies, body)
+    table.insert(self.shapes, shape)
+    table.insert(self.fixtures, fixture)
+    table.insert(self.sensors, sensor)
+
+    -- Set self.---- to the first added ----
+    if #self.bodies == 1 then
+        self.w, self.h, self.r = body_w, body_h, body_r
+        self.body = self.bodies[1]
+        self.shape = self.shapes[1]
+        self.fixture = self.fixtures[1]
+        self.sensor = self.sensors[1]
+    end
+end
+
+function PhysicsBody:addJoint(type, ...)
+    local args = {...}
+    local joint_name = string.lower(type)
+    local joint = nil
+    local joint_name_to_function_name = {
+        distance = 'newDistanceJoint', friction = 'newFrictionJoint', gear = 'newGearJoint',
+        mouse = 'newMouseJoint', prismatic = 'newPrismaticJoint', pulley = 'newPulleyJoint',
+        revolute = 'newRevoluteJoint', rope = 'newRopeJoint', weld = 'newWeldJoint', wheel = 'newWheelJoint',
+    }
+    joint = love.physics[joint_name_to_function_name[joint_name]](unpack(args))
+    table.insert(joint, joints)
 end
 
 function PhysicsBody:physicsBodyUpdate(dt)
@@ -45,21 +91,25 @@ end
 
 function PhysicsBody:physicsBodyDraw()
     self.x, self.y = self.body:getPosition()
-    if self.world.mg.debug_draw then
-        if self.shape_name == 'bsgrectangle' or self.shape_name == 'polygon' or self.shape_name == 'rectangle' then
+    if not self.world.mg.debug_draw then return end
+
+    for i = 1, #self.bodies do
+        if self.shapes[i]:type() == 'PolygonShape' then
             love.graphics.setColor(64, 128, 244)
-            love.graphics.polygon('line', self.body:getWorldPoints(self.shape:getPoints()))
+            love.graphics.polygon('line', self.bodies[i]:getWorldPoints(self.shapes[i]:getPoints()))
             love.graphics.setColor(255, 255, 255)
-        elseif self.shape_name == 'chain' then
+
+        elseif self.shapes[i]:type() == 'EdgeShape' then
             love.graphics.setColor(64, 128, 244)
-            local points = {self.body:getWorldPoints(self.shape:getPoints())}
+            local points = {self.bodies[i]:getWorldPoints(self.shapes[i]:getPoints())}
             for i = 1, #points, 2 do
                 if i < #points-2 then love.graphics.line(points[i], points[i+1], points[i+2], points[i+3]) end
             end
             love.graphics.setColor(255, 255, 255)
-        elseif self.shape_name == 'circle' then
+
+        elseif self.shapes[i]:type() == 'CircleShape' then
             love.graphics.setColor(64, 128, 244)
-            local x, y = self.body:getPosition()
+            local x, y = self.bodies[i]:getPosition()
             love.graphics.circle('line', x, y, self.r, 360)
             love.graphics.setColor(255, 255, 255)
         end

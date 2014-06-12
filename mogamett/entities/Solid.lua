@@ -1,6 +1,6 @@
 local Entity = require(mogamett_path .. '/entities/Entity')
-local Solid = Entity:extend('Solid')
 local PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
+local Solid = Entity:extend('Solid')
 Solid:implement(PhysicsBody)
 
 function Solid:new(world, x, y, settings)
