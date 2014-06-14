@@ -35,6 +35,12 @@ function World:new(mg)
     self.stopped = false
 
     for class_name, _ in pairs(self.mg.classes) do self:addGroup(class_name) end
+
+    self:collisionClear()
+    self:collisionSet()
+end
+
+function World:collisionSet()
     local collision_table = self.mg.Collision:getCollisionCallbacksTable()
     for class_name, collision_list in pairs(collision_table) do
         for _, collision_info in ipairs(collision_list) do
@@ -66,6 +72,9 @@ function World:update(dt)
     self:createPostWorldStep()
     self:removePostWorldStep()
     for _, group in ipairs(self.groups) do group:removePostWorldStep() end
+
+    self:collisionClear()
+    self:collisionSet()
 end
 
 function World:draw()

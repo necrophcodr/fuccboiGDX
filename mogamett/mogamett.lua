@@ -1,102 +1,99 @@
 mogamett_path = string.sub(..., 1, -10)
 
-local mm = {}
+mg = {}
 
 -- hump
-mm.Timer = require (mogamett_path .. '/libraries/mogamett/timer')
-mm.timer = mm.Timer.new()
-mm.Camera = require (mogamett_path .. '/libraries/hump/camera')
-mm.Vector = require (mogamett_path .. '/libraries/hump/vector')
-mm.Gamestate = require (mogamett_path .. '/libraries/hump/gamestate')
+mg.Timer = require (mogamett_path .. '/libraries/mogamett/timer')
+mg.timer = mg.Timer.new()
+mg.Camera = require (mogamett_path .. '/libraries/hump/camera')
+mg.Vector = require (mogamett_path .. '/libraries/hump/vector')
+mg.Gamestate = require (mogamett_path .. '/libraries/hump/gamestate')
 
 -- AnAL
-mm.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
+mg.Animation = require (mogamett_path .. '/libraries/anal/AnAL')
 
-mm.Tilemap = require (mogamett_path .. '/libraries/mogamett/tilemap')
-mm.Text = require (mogamett_path .. '/libraries/mogamett/text')
+mg.Tilemap = require (mogamett_path .. '/libraries/mogamett/tilemap')
+mg.Text = require (mogamett_path .. '/libraries/mogamett/text')
 
 -- Group
-mm.Group = require (mogamett_path .. '/world/Group')
+mg.Group = require (mogamett_path .. '/world/Group')
 
-mm.Class = require (mogamett_path .. '/libraries/classic/classic')
--- holds all classes created with the mm.class call
-mm.classes = {}
-mm.class = function(class_name, ...)
+mg.Class = require (mogamett_path .. '/libraries/classic/classic')
+-- holds all classes created with the mg.class call
+mg.classes = {}
+mg.class = function(class_name, ...)
     local args = {...}
-    mm.classes[class_name] = mm[args[1]]:extend(class_name)
-    return mm.classes[class_name]
+    mg.classes[class_name] = mg[args[1]]:extend(class_name)
+    return mg.classes[class_name]
 end
 
 -- love-loader
-mm.Assets = {}
-mm.Loader = require (mogamett_path .. '/libraries/love-loader/love-loader')
+mg.Assets = {}
+mg.Loader = require (mogamett_path .. '/libraries/love-loader/love-loader')
 
 -- lovebird
-mm.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
+mg.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
 
 -- input
-mm.Input = require (mogamett_path .. '/libraries/mogamett/input')
-mm.input = mm.Input()
-mm.keypressed = function(key) mm.input:keypressed(key) end
-mm.keyreleased = function(key) mm.input:keyreleased(key) end
-mm.mousepressed = function(button) mm.input:mousepressed(button) end
-mm.mousereleased = function(button) mm.input:mousereleased(button) end
+mg.Input = require (mogamett_path .. '/libraries/mogamett/input')
+mg.input = mg.Input()
+mg.keypressed = function(key) mg.input:keypressed(key) end
+mg.keyreleased = function(key) mg.input:keyreleased(key) end
+mg.mousepressed = function(button) mg.input:mousepressed(button) end
+mg.mousereleased = function(button) mg.input:mousereleased(button) end
 
 -- collision, holds global collision data (mostly who should ignore who and callback settings)
-mm.Collision = require (mogamett_path .. '/libraries/mogamett/collision')(mm)
+mg.Collision = require (mogamett_path .. '/libraries/mogamett/collision')(mg)
 
 -- utils
-mm.utils = require (mogamett_path .. '/libraries/mogamett/utils')
+mg.utils = require (mogamett_path .. '/libraries/mogamett/utils')
 
 -- global
-mm.getUID = function()
-    mm.uid = mm.uid + 1
-    return mm.uid
+mg.getUID = function()
+    mg.uid = mg.uid + 1
+    return mg.uid
 end
 
-mm.uid = 0
-mm.path = nil
-mm.debug_draw = true
-mm.lovebird_enabled = false
-mm.game_width = love.window.getWidth()
-mm.game_height = love.window.getHeight()
-
-mm.addCollisionClass = function(class_name, ignores)
-    mm.classes[class_name] = {ignores = ignores}
-end
+mg.uid = 0
+mg.path = nil
+mg.debug_draw = true
+mg.lovebird_enabled = false
+mg.game_width = love.window.getWidth()
+mg.game_height = love.window.getHeight()
 
 -- init
-mm.init = function()
+mg.init = function()
     love.graphics.setDefaultFilter('nearest', 'nearest')
-    mm.world = mm.World(mm)
-    mm.Collision:generateCategoriesMasks()
-    mm.game_width = love.window.getWidth()
-    mm.game_height = love.window.getHeight()
+    mg.world = mg.World(mg)
+    -- mg.Collision:generateCategoriesMasks()
+    mg.game_width = love.window.getWidth()
+    mg.game_height = love.window.getHeight()
 end
 
 -- world
-mm.World = require (mogamett_path .. '/world/World')
+mg.World = require (mogamett_path .. '/world/World')
 
 -- entity
-mm.Background = require (mogamett_path .. '/entities/Background') 
-mm.Entity = require (mogamett_path .. '/entities/Entity')
-mm.Solid = require (mogamett_path .. '/entities/Solid')
-mm.classes['Solid'] = mm.Solid
+mg.Background = require (mogamett_path .. '/entities/Background') 
+mg.Entity = require (mogamett_path .. '/entities/Entity')
+mg.Solid = require (mogamett_path .. '/entities/Solid')
+mg.classes['Solid'] = mg.Solid
 
 -- mixin
-mm.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
+mg.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
 
-mm.update = function(dt)
-    if mm.lovebird_enabled then mm.lovebird.update() end
-    mm.world:update(dt)
-    mm.timer:update(dt)
+mg.update = function(dt)
+    if mg.lovebird_enabled then mg.lovebird.update() end
+    mg.Collision:generateCategoriesMasks()
+    mg.world:update(dt)
+    mg.timer:update(dt)
 end
 
-mm.draw = function()
-    mm.world:draw()
+mg.draw = function()
+    mg.world:draw()
 end
 
-mm.run = function()
+mg.run = function()
     local dt = 0
     local fixed_dt = 1/60
     local accumulator = 0
@@ -126,7 +123,7 @@ mm.run = function()
         -- Call update and draw
         accumulator = accumulator + dt
         while accumulator >= fixed_dt do
-            if love.update then love.update(fixed_dt); mm.input:update(dt) end
+            if love.update then love.update(fixed_dt); mg.input:update(dt) end
             accumulator = accumulator - fixed_dt
         end
 
@@ -141,4 +138,4 @@ mm.run = function()
     end
 end
 
-return mm
+return mg

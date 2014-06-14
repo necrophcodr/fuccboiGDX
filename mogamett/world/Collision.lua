@@ -14,6 +14,10 @@ local Class = require (mogamett_path .. '/libraries/classic/classic')
 local Collision = Class:extend()
 
 function Collision:collisionNew()
+    self:collisionClear()
+end
+
+function Collision:collisionClear()
     self.collisions = {}
     self.collisions.on_enter = {}
     self.collisions.on_enter.sensor = {}

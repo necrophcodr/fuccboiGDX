@@ -83,6 +83,10 @@ function collision:generateCategoriesMasks()
     end
 end
 
+function collision:addCollisionClass(class_name, ignores)
+    mg.classes[class_name] = {ignores = ignores}
+end
+
 function collision:getCollisionCallbacksTable()
     local collision_table = {}
     for class_name, class in pairs(self.mm.classes) do

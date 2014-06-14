@@ -90,6 +90,14 @@ function PhysicsBody:removeJoint(n)
     table.remove(self.joints, n)
 end
 
+function PhysicsBody:changeCollisionClass(n, collision_class)
+    self.fixtures[n]:setCategory(unpack(self.world.mg.Collision.masks[collision_class].categories))
+    self.fixtures[n]:setMask(unpack(self.world.mg.Collision.masks[collision_class].masks))
+    self.fixtures[n]:setUserData({object = self, mask_name = collision_class})
+    self.sensors[n]:setSensor(true)
+    self.sensors[n]:setUserData({object = self, mask_name = collision_class})
+end
+
 function PhysicsBody:physicsBodyUpdate(dt)
     self.x, self.y = self.body:getPosition()
 end
