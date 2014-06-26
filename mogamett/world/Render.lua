@@ -23,6 +23,12 @@ function Render:sortRenderOrder(order_function)
     end
 end
 
+function Render:sortRenderOrderManual(order_function)
+    for _, layer_name in ipairs(self.layers_order) do
+        self.layers[layer_name] = order_function(self.layers[layer_name])
+    end
+end
+
 function Render:addLayer(layer_name, scale)
     self.layers[layer_name] = {scale = scale or 1}
 end

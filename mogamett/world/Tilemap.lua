@@ -64,18 +64,19 @@ function Tilemap:generateCollisionSolids(tilemap)
                 end
                 i = i + 1
             end
-            if direction == 'right' then 
-                return x+i-2, y
-            elseif direction == 'left' then 
-                return x-i+2, y 
-            end
+            if direction == 'right' then return x+i-2, y
+            elseif direction == 'left' then return x-i+2, y end
 
         elseif direction == 'up' or direction == 'down' then
             while current_tile == 1 do
                 if direction == 'up' then
-                    current_tile = solid_grid[y-i][x]
+                    if solid_grid[y-i] then
+                        current_tile = solid_grid[y-i][x]
+                    else current_tile = nil end
                 elseif direction == 'down' then
-                    current_tile = solid_grid[y+i][x]
+                    if solid_grid[y+i] then
+                        current_tile = solid_grid[y+i][x]
+                    else current_tile = nil end
                 end
                 i = i + 1
             end

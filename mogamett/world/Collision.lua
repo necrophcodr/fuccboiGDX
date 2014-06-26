@@ -1,11 +1,11 @@
 local function collEnsure(class_name1, a, class_name2, b)
-    if a.mask_name == class_name2 and b.mask_name == class_name1 then return b, a
+    if a.tag == class_name2 and b.tag == class_name1 then return b, a
     else return a, b end
 end
 
 local function collIf(class_name1, class_name2, a, b)
-    if (a.mask_name == class_name1 and b.mask_name == class_name2) or
-       (a.mask_name == class_name2 and b.mask_name == class_name1) then
+    if (a.tag == class_name1 and b.tag == class_name2) or
+       (a.tag == class_name2 and b.tag == class_name1) then
        return true
     else return false end
 end

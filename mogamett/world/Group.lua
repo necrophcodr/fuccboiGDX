@@ -37,21 +37,23 @@ function Group:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
             if self.entities[i].timer then self.entities[i].timer:destroy() end
-            for j = #self.entities[i].bodies, 1, -1 do
-                if self.entities[i].bodies[j]:type() == 'Body' then 
-                    if self.entities[i].fixtures[j] then self.entities[i].fixtures[j]:setUserData(nil) end
-                    if self.entities[i].sensors[j] then self.entities[i].sensors[j]:setUserData(nil) end
-                    if self.entities[i].joints[j] then self.entities[i].joints[j]:destroy() end
-                    if self.entities[i].bodies[j] then self.entities[i].bodies[j]:destroy() end
-                    if j == 1 then
-                        self.entities[i].fixture = nil
-                        self.entities[i].sensor = nil
-                        self.entities[i].body = nil
+            if self.entities[i].bodies then
+                for j = #self.entities[i].bodies, 1, -1 do
+                    if self.entities[i].bodies[j]:type() == 'Body' then 
+                        if self.entities[i].fixtures[j] then self.entities[i].fixtures[j]:setUserData(nil) end
+                        if self.entities[i].sensors[j] then self.entities[i].sensors[j]:setUserData(nil) end
+                        if self.entities[i].joints[j] then self.entities[i].joints[j]:destroy() end
+                        if self.entities[i].bodies[j] then self.entities[i].bodies[j]:destroy() end
+                        if j == 1 then
+                            self.entities[i].fixture = nil
+                            self.entities[i].sensor = nil
+                            self.entities[i].body = nil
+                        end
+                        self.entities[i].fixtures[j] = nil
+                        self.entities[i].sensors[j] = nil
+                        self.entities[i].joints[j] = nil
+                        self.entities[i].bodies[j] = nil
                     end
-                    self.entities[i].fixtures[j] = nil
-                    self.entities[i].sensors[j] = nil
-                    self.entities[i].joints[j] = nil
-                    self.entities[i].bodies[j] = nil
                 end
             end
             self.entities[i].world:removeFromRender(self.entities[i].id)

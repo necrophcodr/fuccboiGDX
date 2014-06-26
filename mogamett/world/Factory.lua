@@ -10,8 +10,7 @@ function Factory:createEntity(type, x, y, settings)
 end
 
 function Factory:createEntityImmediate(type, x, y, settings)
-    local entity = classes[o.type](self, o.x, o.y, o.settings)
-    self:addToGroup(o.type, entity)
+    local entity = self.mg.classes[type](self, x, y, settings)
     return entity 
 end
 

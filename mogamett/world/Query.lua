@@ -77,10 +77,7 @@ function Query:queryAreaCircle(x, y, radius, object_types)
         for _, group in ipairs(self.groups) do
             if group.name == type then
                 for _, object in ipairs(group:getEntities()) do
-                    local _x, _y = nil, nil
-                    if object.class:includes(PhysicsBody) then
-                        _x, _y = object.body:getPosition()
-                    else _x, _y = object.x, object.y end
+                    local _x, _y = object.x, object.y
                     local dx, dy = math.abs(x - _x), math.abs(y - _y)
                     local distance = math.sqrt(dx*dx + dy*dy)
                     if distance < radius then 
@@ -99,10 +96,7 @@ function Query:queryAreaRectangle(x, y, w, h, object_types)
         for _, group in ipairs(self.groups) do
             if group.name == type then
                 for _, object in ipairs(group:getEntities()) do
-                    local _x, _y = nil, nil
-                    if object.class:includes(PhysicsBody) then
-                        _x, _y = object.body:getPosition()
-                    else _x, _y = object.x, object.y end
+                    local _x, _y = object.x, object.y
                     local dx, dy = math.abs(x - _x), math.abs(y - _y)
                     if dx <= object.w/2 + w/2 and dy <= object.h/2 + h/2 then
                         table.insert(objects, object)

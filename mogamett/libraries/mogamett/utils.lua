@@ -104,6 +104,7 @@ utils.table.copy = function(t)
     else copy = t end
     return copy
 end
+
 -- math
 utils.math = {}
 
@@ -145,6 +146,23 @@ utils.math.chooseWithProbability = function(choices, chances)
             if r <= intervals[i] then return choices[i] end
         end
     end
+end
+
+-- Converts old_value that is between old_min and old_max to a new_value that is contained
+-- within new_min and new_max while maintaining their ratio.
+-- Ex.: print(convertRange(2, 1, 3, 0, 1)) --> 0.5
+-- new_min and new_max defaults to 0 and 1 if omitted
+utils.math.convertRange = function(old_value, old_min, old_max, new_min, new_max)
+    local new_min = new_min or 0
+    local new_max = new_max or 1
+    local new_value = 0
+    local old_range = old_max - old_min
+    if old_range == 0 then new_value = new_min 
+    else
+        local new_range = new_max - new_min
+        new_value = (((old_value - old_min)*new_range)/old_range) + new_min
+    end
+    return new_value
 end
 
 -- misc

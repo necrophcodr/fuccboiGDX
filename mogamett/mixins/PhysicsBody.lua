@@ -52,10 +52,10 @@ function PhysicsBody:addBody(world, x, y, settings)
     local fixture = love.physics.newFixture(body, shape)
     fixture:setCategory(unpack(self.world.mg.Collision.masks[mask_name].categories))
     fixture:setMask(unpack(self.world.mg.Collision.masks[mask_name].masks))
-    fixture:setUserData({object = self, mask_name = mask_name})
+    fixture:setUserData({object = self, tag = mask_name})
     local sensor = love.physics.newFixture(body, shape)
     sensor:setSensor(true)
-    sensor:setUserData({object = self, mask_name = mask_name})
+    sensor:setUserData({object = self, tag = mask_name})
 
     table.insert(self.bodies, body)
     table.insert(self.shapes, shape)
@@ -70,6 +70,15 @@ function PhysicsBody:addBody(world, x, y, settings)
         self.fixture = self.fixtures[1]
         self.sensor = self.sensors[1]
     end
+end
+
+function PhysicsBody:removeBody(n)
+    self.fixtures[n]:setUserData(nil)
+    self.sensors[n]:setUserData(nil)
+    self.bodies[n]:destroy()
+    table.remove(self.fixtures, n)
+    table.remove(self.sensors, n)
+    table.remove(self.bodies, n)
 end
 
 function PhysicsBody:addJoint(type, ...)
@@ -93,9 +102,9 @@ end
 function PhysicsBody:changeCollisionClass(n, collision_class)
     self.fixtures[n]:setCategory(unpack(self.world.mg.Collision.masks[collision_class].categories))
     self.fixtures[n]:setMask(unpack(self.world.mg.Collision.masks[collision_class].masks))
-    self.fixtures[n]:setUserData({object = self, mask_name = collision_class})
+    self.fixtures[n]:setUserData({object = self, tag = collision_class})
     self.sensors[n]:setSensor(true)
-    self.sensors[n]:setUserData({object = self, mask_name = collision_class})
+    self.sensors[n]:setUserData({object = self, tag = collision_class})
 end
 
 function PhysicsBody:physicsBodyUpdate(dt)

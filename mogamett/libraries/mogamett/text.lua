@@ -440,6 +440,8 @@ function Text:draw(x, y)
     love.graphics.setFont(self.font)
 
     for _, c in ipairs(self.characters) do
+        c.x_offset = x
+        c.y_offset = y
         -- Call each modifier function
         local called_functions = {}
         for _, modifier in ipairs(c.modifiers) do

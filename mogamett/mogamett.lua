@@ -41,6 +41,9 @@ mg.keypressed = function(key) mg.input:keypressed(key) end
 mg.keyreleased = function(key) mg.input:keyreleased(key) end
 mg.mousepressed = function(button) mg.input:mousepressed(button) end
 mg.mousereleased = function(button) mg.input:mousereleased(button) end
+mg.gamepadpressed = function(joystick, button) mg.input:gamepadpressed(joystick, button) end
+mg.gamepadreleased = function(joystick, button) mg.input:gamepadreleased(joystick, button) end
+mg.gamepadaxis = function(joystick, axis, newvalue) mg.input:gamepadaxis(joystick, axis, newvalue) end
 
 -- collision, holds global collision data (mostly who should ignore who and callback settings)
 mg.Collision = require (mogamett_path .. '/libraries/mogamett/collision')(mg)
