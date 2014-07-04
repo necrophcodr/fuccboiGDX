@@ -121,7 +121,7 @@ utils.math.random = function(min, max)
 end
 
 utils.math.round = function(n, p)
-    local m = math.power(10, p or 0)
+    local m = math.pow(10, p or 0)
     return math.floor(n*m+0.5)/m
 end
 

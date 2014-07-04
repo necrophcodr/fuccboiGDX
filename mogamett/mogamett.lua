@@ -81,6 +81,8 @@ mg.Background = require (mogamett_path .. '/entities/Background')
 mg.Entity = require (mogamett_path .. '/entities/Entity')
 mg.Solid = require (mogamett_path .. '/entities/Solid')
 mg.classes['Solid'] = mg.Solid
+mg.Spritebatch = require (mogamett_path .. '/entities/Spritebatch')
+mg.Spritebatches = {}
 
 -- mixin
 mg.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
@@ -88,6 +90,7 @@ mg.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
 mg.update = function(dt)
     if mg.lovebird_enabled then mg.lovebird.update() end
     mg.Collision:generateCategoriesMasks()
+    for k, s in pairs(mg.Spritebatches) do s:update(dt) end
     mg.world:update(dt)
     mg.timer:update(dt)
 end

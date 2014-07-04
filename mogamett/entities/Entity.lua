@@ -5,6 +5,7 @@ function Entity:new(world, x, y, settings)
     self.dead = false
     self.world = world
     self.id = self.world.mg.getUID()
+    self.pool_active = false
     self.x = x
     self.y = y
     if settings then

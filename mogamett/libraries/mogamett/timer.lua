@@ -10,11 +10,15 @@ end
 function timer:update(dt)
     self.timer:update(dt)
 end
+
 function timer:tween(tag, duration, table, tween_table, tween_function, after)
     if type(tag) == 'number' or type(tag) == 'table' then
         return self.timer:tween(tag, duration, table, tween_table, tween_function)
     end
     if not self.tags[tag] then
+        self.tags[tag] = self.timer:tween(duration, table, tween_table, tween_function, after)
+    else
+        self.timer:cancel(self.tags[tag])
         self.tags[tag] = self.timer:tween(duration, table, tween_table, tween_function, after)
     end
 end
@@ -25,6 +29,9 @@ function timer:after(tag, duration, func)
     end
     if not self.tags[tag] then
         self.tags[tag] = self.timer:after(duration, func)
+    else
+        self.timer:cancel(self.tags[tag])
+        self.tags[tag] = self.timer:after(duration, func)
     end
 end
 
@@ -34,7 +41,10 @@ function timer:every(tag, duration, func, count)
     end
     if not self.tags[tag] then
         self.tags[tag] = self.timer:every(duration, func, count)
-    end 
+    else
+        self.timer:cancel(self.tags[tag])
+        self.tags[tag] = self.timer:every(duration, func, count)
+    end
 end
 
 function timer:during(tag, duration, func, after)
@@ -42,6 +52,9 @@ function timer:during(tag, duration, func, after)
         return self.timer:during(tag, duration, func)
     end
     if not self.tags[tag] then
+        self.tags[tag] = self.timer:during(duration, func, after)
+    else
+        self.timer:cancel(self.tags[tag])
         self.tags[tag] = self.timer:during(duration, func, after)
     end
 end
