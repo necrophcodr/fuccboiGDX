@@ -33,11 +33,24 @@ function Pool:getFirstFreeObject()
         self.objects[j].last_time = love.timer.getTime()
         self.objects[j].object.pool_active = true
         return self.objects[j].object
+
     elseif self.overflow_rule == 'random' then
         return self.objects[math.random(1, self.size)].object
-    elseif self.overflow_rule == 'never' then
 
-    end
+    elseif self.overflow_rule == 'distance' then
+        local max, j = -100000, 1
+        for i = 1, self.size do
+            local object = self.objects[i].object
+            local c_x, c_y = object.world.camera:getWorldCoords(object.world.mg.game_width/2, object.world.mg.game_height/2)
+            local dx, dy = c_x - object.x, c_y - object.y
+            local d = dx*dx + dy*dy
+            if d > max then max = d; j = i end
+        end
+        self.objects[j].last_time = love.timer.getTime()
+        self.objects[j].object.pool_active = true
+        return self.objects[j].object
+
+    elseif self.overflow_rule == 'never' then end
 end
 
 function Pool:unsetObject(object)

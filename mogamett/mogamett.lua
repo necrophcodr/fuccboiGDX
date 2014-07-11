@@ -34,13 +34,34 @@ mg.Loader = require (mogamett_path .. '/libraries/love-loader/love-loader')
 -- lovebird
 mg.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
 
+-- UI
+require(string.gsub(mogamett_path, '/', '.') .. '.libraries.loveframes')
+mg.loveframes = loveframes
+
 -- input
 mg.Input = require (mogamett_path .. '/libraries/mogamett/input')
 mg.input = mg.Input()
-mg.keypressed = function(key) mg.input:keypressed(key) end
-mg.keyreleased = function(key) mg.input:keyreleased(key) end
-mg.mousepressed = function(button) mg.input:mousepressed(button) end
-mg.mousereleased = function(button) mg.input:mousereleased(button) end
+mg.textinput = function(text)
+    mg.loveframes.textinput(text)
+end
+mg.keypressed = function(key) 
+    mg.input:keypressed(key) 
+    mg.loveframes.keypressed(key)
+end
+mg.keyreleased = function(key) 
+    mg.input:keyreleased(key) 
+    mg.loveframes.keyreleased(key)
+end
+mg.mousepressed = function(button) 
+    mg.input:mousepressed(button) 
+    local x, y = love.mouse.getPosition()
+    mg.loveframes.mousepressed(x, y, button)
+end
+mg.mousereleased = function(button) 
+    mg.input:mousereleased(button) 
+    local x, y = love.mouse.getPosition()
+    mg.loveframes.mousereleased(x, y, button)
+end
 mg.gamepadpressed = function(joystick, button) mg.input:gamepadpressed(joystick, button) end
 mg.gamepadreleased = function(joystick, button) mg.input:gamepadreleased(joystick, button) end
 mg.gamepadaxis = function(joystick, axis, newvalue) mg.input:gamepadaxis(joystick, axis, newvalue) end
@@ -89,6 +110,7 @@ mg.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
 
 mg.update = function(dt)
     if mg.lovebird_enabled then mg.lovebird.update() end
+    mg.loveframes.update(dt)
     mg.Collision:generateCategoriesMasks()
     for k, s in pairs(mg.Spritebatches) do s:update(dt) end
     mg.world:update(dt)
@@ -97,6 +119,7 @@ end
 
 mg.draw = function()
     mg.world:draw()
+    mg.loveframes.draw()
 end
 
 mg.run = function()

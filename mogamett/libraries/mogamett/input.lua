@@ -74,6 +74,8 @@ end
 
 function input:update(dt)
     self.prev_state = copy(self.state)
+    self.state['wheelup'] = false
+    self.state['wheeldown'] = false
 end
 
 function input:keypressed(key)
