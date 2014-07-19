@@ -12,11 +12,17 @@ function PhysicsBody:physicsBodyNew(world, x, y, settings)
 end
 
 function PhysicsBody:addBody(world, x, y, settings)
-    settings = settings or {}
+    -- Set name to main if there isn't one and/or remove previous physics names if they already exist
+    local settings = settings or {}
+    settings.physics_name = settings.physics_name or 'main'
+    local name = settings.physics_name
+    if self.bodies[name] then self:removeBody(name) end
 
+    -- Define body
     local body = love.physics.newBody(world.world, x, y, settings.body_type or 'dynamic')
     body:setFixedRotation(true)
 
+    -- Define shape
     settings.shape = settings.shape or 'rectangle'
     local shape = nil
     local shape_name = string.lower(settings.shape)
@@ -49,6 +55,7 @@ function PhysicsBody:addBody(world, x, y, settings)
         shape = love.physics.newCircleShape(settings.r or 16)
     end
 
+    -- Define collision classes and attach them to fixture and sensor
     local mask_name = settings.collision_class or self.class_name
     local fixture = love.physics.newFixture(body, shape)
     fixture:setCategory(unpack(self.world.mg.Collision.masks[mask_name].categories))
@@ -58,31 +65,45 @@ function PhysicsBody:addBody(world, x, y, settings)
     sensor:setSensor(true)
     sensor:setUserData({object = self, tag = mask_name})
 
-    table.insert(self.bodies, body)
-    table.insert(self.shapes, shape)
-    table.insert(self.fixtures, fixture)
-    table.insert(self.sensors, sensor)
+    self.bodies[name] = body
+    self.shapes[name] = shape
+    self.fixtures[name] = fixture
+    self.sensors[name] = sensor
 
-    -- Set self.---- to the first added ----
-    if #self.bodies == 1 then
+    -- self.body, shape, fixture, sensor = the main body, shape, fixture, sensor
+    if name == 'main' then
         self.w, self.h, self.r = body_w, body_h, body_r
-        self.body = self.bodies[1]
-        self.shape = self.shapes[1]
-        self.fixture = self.fixtures[1]
-        self.sensor = self.sensors[1]
+        self.body = self.bodies['main']
+        self.shape = self.shapes['main']
+        self.fixture = self.fixtures['main']
+        self.sensor = self.sensors['main']
     end
 end
 
-function PhysicsBody:removeBody(n)
-    self.fixtures[n]:setUserData(nil)
-    self.sensors[n]:setUserData(nil)
-    self.bodies[n]:destroy()
-    table.remove(self.fixtures, n)
-    table.remove(self.sensors, n)
-    table.remove(self.bodies, n)
+function PhysicsBody:removeBody(name)
+    if not self.bodies[name] then return end
+    self.fixtures[name]:setUserData(nil)
+    self.sensors[name]:setUserData(nil)
+    self.bodies[name]:destroy()
+    self.fixtures[name] = nil
+    self.sensors[name] = nil
+    self.shapes[name] = nil
+    self.bodies[name] = nil
 end
 
-function PhysicsBody:addJoint(type, ...)
+function PhysicsBody:removeJoint(name)
+    if not self.joints[name] then return end
+    self.joints[name]:destroy()
+    self.joints[name] = nil
+end
+
+function PhysicsBody:removeShape(name)
+    if not self.shapes[name] then return end
+    self.shapes[name] = nil
+end
+
+function PhysicsBody:addJoint(name, type, ...)
+    if self.joints[name] then self:removeJoint(name) end
     local args = {...}
     local joint_name = string.lower(type)
     local joint = nil
@@ -92,24 +113,16 @@ function PhysicsBody:addJoint(type, ...)
         revolute = 'newRevoluteJoint', rope = 'newRopeJoint', weld = 'newWeldJoint', wheel = 'newWheelJoint',
     }
     joint = love.physics[joint_name_to_function_name[joint_name]](unpack(args))
-    table.insert(self.joints, joint)
+    self.joints[name] = joint
 end
 
-function PhysicsBody:removeJoint(n)
-    self.joints[n]:destroy()
-    table.remove(self.joints, n)
-end
-
-function PhysicsBody:removeShape(n)
-    table.remove(self.shapes, n)
-end
-
-function PhysicsBody:changeCollisionClass(n, collision_class)
-    self.fixtures[n]:setCategory(unpack(self.world.mg.Collision.masks[collision_class].categories))
-    self.fixtures[n]:setMask(unpack(self.world.mg.Collision.masks[collision_class].masks))
-    self.fixtures[n]:setUserData({object = self, tag = collision_class})
-    self.sensors[n]:setSensor(true)
-    self.sensors[n]:setUserData({object = self, tag = collision_class})
+function PhysicsBody:changeCollisionClass(name, collision_class)
+    if not self.fixtures[name] then return end -- fail silently or not? Same question for add/remove calls
+    self.fixtures[name]:setCategory(unpack(self.world.mg.Collision.masks[collision_class].categories))
+    self.fixtures[name]:setMask(unpack(self.world.mg.Collision.masks[collision_class].masks))
+    self.fixtures[name]:setUserData({object = self, tag = collision_class})
+    self.sensors[name]:setSensor(true)
+    self.sensors[name]:setUserData({object = self, tag = collision_class})
 end
 
 function PhysicsBody:physicsBodyUpdate(dt)
@@ -120,30 +133,30 @@ function PhysicsBody:physicsBodyDraw()
     self.x, self.y = self.body:getPosition()
     if not self.world.mg.debug_draw then return end
 
-    for i = 1, #self.bodies do
-        if self.shapes[i]:type() == 'PolygonShape' then
+    for name, body in pairs(self.bodies) do
+        if self.shapes[name]:type() == 'PolygonShape' then
             love.graphics.setColor(64, 128, 244)
-            love.graphics.polygon('line', self.bodies[i]:getWorldPoints(self.shapes[i]:getPoints()))
+            love.graphics.polygon('line', self.bodies[name]:getWorldPoints(self.shapes[name]:getPoints()))
             love.graphics.setColor(255, 255, 255)
 
-        elseif self.shapes[i]:type() == 'EdgeShape' then
+        elseif self.shapes[name]:type() == 'EdgeShape' then
             love.graphics.setColor(64, 128, 244)
-            local points = {self.bodies[i]:getWorldPoints(self.shapes[i]:getPoints())}
+            local points = {self.bodies[name]:getWorldPoints(self.shapes[name]:getPoints())}
             for i = 1, #points, 2 do
                 if i < #points-2 then love.graphics.line(points[i], points[i+1], points[i+2], points[i+3]) end
             end
             love.graphics.setColor(255, 255, 255)
 
-        elseif self.shapes[i]:type() == 'CircleShape' then
+        elseif self.shapes[name]:type() == 'CircleShape' then
             love.graphics.setColor(64, 128, 244)
-            local x, y = self.bodies[i]:getPosition()
+            local x, y = self.bodies[name]:getPosition()
             love.graphics.circle('line', x, y, self.r, 360)
             love.graphics.setColor(255, 255, 255)
         end
     end
 
-    for i = 1, #self.joints do
-        local x1, y1, x2, y2 = self.joints[i]:getAnchors()
+    for name, joint in pairs(self.joints) do
+        local x1, y1, x2, y2 = self.joints[name]:getAnchors()
         love.graphics.setPointSize(8)
         love.graphics.setColor(244, 128, 64)
         love.graphics.point(x1, y1)
@@ -159,14 +172,17 @@ function PhysicsBody:handleCollisions(type, object, contact, ni1, ti1, ni2, ti2)
         if self.preSolve then
             self:preSolve(object, contact)
         end
+        
     elseif type == 'post' then
         if self.postSolve then
             self:postSolve(object, contact, ni1, ti1, ni2, ti2)
         end
+
     elseif type == 'enter' then
         if self.onCollisionEnter then
             self:onCollisionEnter(object, contact)
         end
+
     elseif type == 'exit' then
         if self.onCollisionExit then
             self:onCollisionExit(object, contact)
