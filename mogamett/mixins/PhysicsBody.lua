@@ -20,6 +20,7 @@ function PhysicsBody:addBody(world, x, y, settings)
     settings.shape = settings.shape or 'rectangle'
     local shape = nil
     local shape_name = string.lower(settings.shape)
+    self.shape_name = shape_name
     local body_w, body_h, body_r = 0, 0, 0
 
     if shape_name == 'bsgrectangle' then
@@ -97,6 +98,10 @@ end
 function PhysicsBody:removeJoint(n)
     self.joints[n]:destroy()
     table.remove(self.joints, n)
+end
+
+function PhysicsBody:removeShape(n)
+    table.remove(self.shapes, n)
 end
 
 function PhysicsBody:changeCollisionClass(n, collision_class)

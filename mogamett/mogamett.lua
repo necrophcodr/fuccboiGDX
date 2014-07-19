@@ -89,9 +89,14 @@ mg.game_height = love.window.getHeight()
 mg.init = function()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     mg.world = mg.World(mg)
-    -- mg.Collision:generateCategoriesMasks()
     mg.game_width = love.window.getWidth()
     mg.game_height = love.window.getHeight()
+end
+
+mg.resize = function(w, h)
+    mg.game_width = w
+    mg.game_height = h
+    mg.world:resize(w, h)
 end
 
 -- world

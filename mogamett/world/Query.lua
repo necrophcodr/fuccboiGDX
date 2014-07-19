@@ -29,6 +29,24 @@ local test2DLineCircle = function(x1, y1, x2, y2, cx, cy, r)
     end
 end
 
+local testPointInPolygon = function(point_x, point_y, polygon_points)
+    local c = false
+    local nvert = #polygon_points/2
+
+    local i, j, c = 1, nvert, false
+
+    while i <= nvert do
+        if (((polygon_points[i+1] > point_y) ~= (polygon_points[j+1] > point_y)) and
+           (point_x < (polygon_points[j] - polygon_points[i])*(point_y - polygon_points[i+1])/(polygon_points[j+1] - polygon_points[i+1]) + polygon_points[i])) then
+           c = not c
+        end
+        j = i
+        i = i + 1
+    end
+
+    return c
+end
+
 local Class = require (mogamett_path .. '/libraries/classic/classic')
 local Query = Class:extend()
 
@@ -108,6 +126,40 @@ function Query:queryAreaRectangle(x, y, w, h, object_types)
     return objects
 end
 
+-- NOT WORKING FIX LTERRR
+function Query:queryPolygon(polygon_points, object_types)
+    local objects = {}
+    for _, type in ipairs(object_types) do
+        for _, group in ipairs(self.groups) do
+            if group.name == type then
+                for _, object in ipairs(group:getEntities()) do
+                    if object.shape_name == 'chain' or object.shape_name == 'bsgrectangle' or
+                       object.shape_name == 'rectangle' or object.shape_name == 'polygon' then
+                        -- Get object points
+                        local object_points = {object.body:getWorldPoints(object.shape:getPoints())}
+                        local colliding = false
+                        for i = 1, #object_points, 2 do
+                            colliding = colliding or testPointInPolygon(object_points[i], object_points[i+1], polygon_points)
+                        end
+                        -- Add segment tests later
+                        if colliding then table.insert(objects, object) end
+                    end
+                end
+            end
+        end
+    end
+    return objects
+end
+
+function Query:applyAreaLine(x1, y1, x2, y2, object_types, action)
+    local objects = self:queryAreaLine(x1, y1, x2, y2, object_types)
+    if #objects > 0 then
+        for _, object in ipairs(objects) do
+            action(object)
+        end
+    end
+end
+
 function Query:queryLine(x1, y1, x2, y2, object_types)
     local objects = {}
     for _, type in ipairs(object_types) do
@@ -170,8 +222,8 @@ function Query:applyAreaCircle(x, y, r, object_types, action)
     end
 end
 
-function Query:applyAreaLine(x1, y1, x2, y2, object_types, action)
-    local objects = self:queryAreaLine(x1, y1, x2, y2, object_types)
+function Query:applyAreaPolygon(polygon_points, object_types, action)
+    local objects = self:queryPolygon(polygon_points, object_types)
     if #objects > 0 then
         for _, object in ipairs(objects) do
             action(object)

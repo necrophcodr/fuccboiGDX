@@ -91,6 +91,10 @@ function World:draw()
     self.camera:debugDraw()
 end
 
+function World:resize(w, h)
+    self:renderResize(w, h)
+end
+
 function World:getAllEntities()
     local entities = {}
     for _, group in ipairs(self.groups) do
