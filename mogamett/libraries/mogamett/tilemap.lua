@@ -115,11 +115,9 @@ function tilemap:autoTile(auto_tile_rules, extended_rules)
     local findTileValueFromAutoTileRules = function(value)
         local results = {}
         for i, v in ipairs(self.auto_tile_rules) do
-            if v == value then-- return i end
-              table.insert(results,i)
-            end
+            if v == value then table.insert(results, i) end
         end
-        return results[math.random(1,#results)]
+        return results[math.random(1, #results)] or 1
     end
 
     -- Set grid values based on auto tiles rules and the temporary bitmask values grid
