@@ -157,33 +157,33 @@ end
 function World:removePostWorldStep()
     for i = #self.entities, 1, -1 do
         if self.entities[i].dead then
-            if self.mg.classes[self.entities[i].class_name].pool_enabled then
-                self.pools[self.entities[i].class_name]:unsetObject(self.entities[i])
+            if self.entities[i].world.mg.classes[self.entities[i].class_name].pool_enabled then
+                self.entities[i].world.pools[self.entities[i].class_name]:unsetObject(self.entities[i])
             else
                 if self.entities[i].timer then self.entities[i].timer:destroy() end
                 if self.entities[i].bodies then
-                    for j = #self.entities[i].bodies, 1, -1 do
-                        if self.entities[i].bodies[j]:type() == 'Body' then 
-                            if self.entities[i].fixtures[j] then self.entities[i].fixtures[j]:setUserData(nil) end
-                            if self.entities[i].sensors[j] then self.entities[i].sensors[j]:setUserData(nil) end
-                            if self.entities[i].joints[j] then self.entities[i].joints[j]:destroy() end
-                            if self.entities[i].bodies[j] then self.entities[i].bodies[j]:destroy() end
+                    for name, _ in pairs(self.entities[i].bodies) do
+                        if self.entities[i].bodies[name]:type() == 'Body' then 
+                            if self.entities[i].fixtures[name] then self.entities[i].fixtures[name]:setUserData(nil) end
+                            if self.entities[i].sensors[name] then self.entities[i].sensors[name]:setUserData(nil) end
+                            if self.entities[i].joints[name] then self.entities[i].joints[name]:destroy() end
+                            if self.entities[i].bodies[name] then self.entities[i].bodies[name]:destroy() end
                             if j == 1 then
                                 self.entities[i].fixture = nil
                                 self.entities[i].sensor = nil
                                 self.entities[i].body = nil
+                                self.entities[i].shape = nil
                             end
-                            self.entities[i].fixtures[j] = nil
-                            self.entities[i].sensors[j] = nil
-                            self.entities[i].joints[j] = nil
-                            self.entities[i].bodies[j] = nil
+                            self.entities[i].fixtures[name] = nil
+                            self.entities[i].sensors[name] = nil
+                            self.entities[i].joints[name] = nil
+                            self.entities[i].bodies[name] = nil
+                            self.entities[i].shapes[name] = nil
                         end
                     end
                 end
                 self.entities[i].world:removeFromRender(self.entities[i].id)
                 table.remove(self.entities, i)
-                -- self.entities[i].world = nil
-                -- self:remove(self.entities[i].id)
             end
         end
     end

@@ -82,20 +82,23 @@ mg.uid = 0
 mg.path = nil
 mg.debug_draw = true
 mg.lovebird_enabled = false
-mg.game_width = love.window.getWidth()
-mg.game_height = love.window.getHeight()
+mg.min_width = 480
+mg.min_height = 360
+mg.screen_width = mg.min_wdith
+mg.screen_height = mg.min_height
+mg.screen_scale = 1
 
 -- init
 mg.init = function()
     love.graphics.setDefaultFilter('nearest', 'nearest')
+    mg.screen_width = mg.min_width
+    mg.screen_heigth = mg.min_height
     mg.world = mg.World(mg)
-    mg.game_width = love.window.getWidth()
-    mg.game_height = love.window.getHeight()
 end
 
 mg.resize = function(w, h)
-    mg.game_width = w
-    mg.game_height = h
+    mg.screen_width = w
+    mg.screen_height = h
     mg.world:resize(w, h)
 end
 
@@ -109,6 +112,7 @@ mg.Solid = require (mogamett_path .. '/entities/Solid')
 mg.classes['Solid'] = mg.Solid
 mg.Spritebatch = require (mogamett_path .. '/entities/Spritebatch')
 mg.Spritebatches = {}
+mg.Shaders = {}
 
 -- mixin
 mg.PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')

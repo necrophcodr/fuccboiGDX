@@ -125,6 +125,16 @@ function PhysicsBody:changeCollisionClass(name, collision_class)
     self.sensors[name]:setUserData({object = self, tag = collision_class})
 end
 
+function PhysicsBody:getGroupIndex(name)
+    if not self.fixtures[name] then return end
+    return self.fixtures[name]:getGroupIndex()
+end
+
+function PhysicsBody:setGroupIndex(name, group_index)
+    if not self.fixtures[name] then return end
+    self.fixtures[name]:setGroupIndex(group_index)
+end
+
 function PhysicsBody:physicsBodyUpdate(dt)
     self.x, self.y = self.body:getPosition()
 end

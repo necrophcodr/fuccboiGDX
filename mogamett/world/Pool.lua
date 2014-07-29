@@ -41,7 +41,7 @@ function Pool:getFirstFreeObject()
         local max, j = -100000, 1
         for i = 1, self.size do
             local object = self.objects[i].object
-            local c_x, c_y = object.world.camera:getWorldCoords(object.world.mg.game_width/2, object.world.mg.game_height/2)
+            local c_x, c_y = object.world.camera:getWorldCoords(object.world.mg.screen_width/2, object.world.mg.screen_height/2)
             local dx, dy = c_x - object.x, c_y - object.y
             local d = dx*dx + dy*dy
             if d > max then max = d; j = i end

@@ -52,7 +52,7 @@ local function new(settings)
 end
 
 function camera:moveTo(x, y)
-	self.x, self.y = x,y
+	self.x, self.y = x, y
 	return self
 end
 
@@ -86,7 +86,7 @@ function camera:zoomTo(zoom)
 end
 
 function camera:attach()
-	local cx,cy = love.graphics.getWidth()/(2*self.scale), love.graphics.getHeight()/(2*self.scale)
+	local cx, cy = love.graphics.getWidth()/(2*self.scale), love.graphics.getHeight()/(2*self.scale)
 	love.graphics.push()
 	love.graphics.scale(self.scale)
 	love.graphics.translate(cx, cy)
@@ -216,6 +216,10 @@ function camera:updateFollow(dt)
     end
 end
 
+function camera:resize(w, h)
+    self:moveTo(self.target.x, self.target.y)
+end
+
 function camera:update(dt)
     self:setGameSize()
     if self.target then self:updateFollow(dt) end
@@ -275,21 +279,21 @@ function camera:debugDraw()
     end
 end
 
-function camera:getCameraCoords(x,y)
+function camera:getCameraCoords(x, y)
 	-- x,y = ((x,y) - (self.x, self.y)):rotated(self.rot) * self.scale + center
-	local w,h = love.graphics.getWidth(), love.graphics.getHeight()
-	local c,s = cos(self.rotation), sin(self.rotation)
-	x,y = x - self.x, y - self.y
-	x,y = c*x - s*y, s*x + c*y
+	local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+	local c, s = cos(self.rotation), sin(self.rotation)
+	x, y = x - self.x, y - self.y
+	x, y = c*x - s*y, s*x + c*y
 	return x*self.scale + w/2, y*self.scale + h/2
 end
 
-function camera:getWorldCoords(x,y)
+function camera:getWorldCoords(x, y)
 	-- x,y = (((x,y) - center) / self.scale):rotated(-self.rot) + (self.x,self.y)
-	local w,h = love.graphics.getWidth(), love.graphics.getHeight()
-	local c,s = cos(-self.rotation), sin(-self.rotation)
-	x,y = (x - w/2) / self.scale, (y - h/2) / self.scale
-	x,y = c*x - s*y, s*x + c*y
+	local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+	local c, s = cos(-self.rotation), sin(-self.rotation)
+	x, y = (x - w/2)/self.scale, (y - h/2)/self.scale
+	x, y = c*x - s*y, s*x + c*y
 	return x+self.x, y+self.y
 end
 

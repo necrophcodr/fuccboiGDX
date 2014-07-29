@@ -49,27 +49,20 @@ function Render:sendToShader(layer_name, shader_name, variable, value)
     self.layers[layer_name]:sendShader(shader_name, variable, value)
 end
 
+function Render:setShaderClassList(layer_name, shader_name, list)
+    self.layers[layer_name]:setShaderClassList(shader_name, list) 
+end
+
 function Render:removeFromRender(id)
     for _, layer in pairs(self.layers) do layer:remove(id) end
 end
 
 function Render:renderUpdate(dt)
     self.camera:update(dt)
-
-    --[[
-    -- Clear dead objects from layers
-    for layer_name, layer in pairs(self.layers) do
-        for i = #self.layers[layer_name], 1, -1 do
-            if self.layers[layer_name][i].dead then print(i); table.remove(self.layers[layer_name], i) end
-        end
-    end
-    ]]--
 end
 
 function Render:renderResize(w, h)
-    for _, layer in pairs(self.layers) do
-        layer:resize(w, h)
-    end
+    self.camera:resize(w, h)
 end
 
 function Render:renderAttach()
@@ -81,6 +74,7 @@ function Render:renderDetach()
 end
 
 function Render:renderDraw()
+    -- Draw all layers
     local bx, by = self.camera:getPosition()
     for _, layer_name in ipairs(self.layers_order) do
         self.camera.x = bx*self.layers[layer_name].parallax_scale
