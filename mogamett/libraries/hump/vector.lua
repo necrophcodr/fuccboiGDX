@@ -55,17 +55,17 @@ function vector.__unm(a)
 	return new(-a.x, -a.y)
 end
 
-function vector.__add(a,b)
+function vector.__add(a, b)
 	assert(isvector(a) and isvector(b), "Add: wrong argument types (<vector> expected)")
 	return new(a.x+b.x, a.y+b.y)
 end
 
-function vector.__sub(a,b)
+function vector.__sub(a, b)
 	assert(isvector(a) and isvector(b), "Sub: wrong argument types (<vector> expected)")
 	return new(a.x-b.x, a.y-b.y)
 end
 
-function vector.__mul(a,b)
+function vector.__mul(a, b)
 	if type(a) == "number" then
 		return new(a*b.x, a*b.y)
 	elseif type(b) == "number" then
@@ -76,26 +76,30 @@ function vector.__mul(a,b)
 	end
 end
 
-function vector.__div(a,b)
+function vector.__div(a, b)
 	assert(isvector(a) and type(b) == "number", "wrong argument types (expected <vector> / <number>)")
 	return new(a.x / b, a.y / b)
 end
 
-function vector.__eq(a,b)
+function vector.__eq(a, b)
 	return a.x == b.x and a.y == b.y
 end
 
-function vector.__lt(a,b)
+function vector.__lt(a, b)
 	return a.x < b.x or (a.x == b.x and a.y < b.y)
 end
 
-function vector.__le(a,b)
+function vector.__le(a, b)
 	return a.x <= b.x and a.y <= b.y
 end
 
-function vector.permul(a,b)
+function vector.permul(a, b)
 	assert(isvector(a) and isvector(b), "permul: wrong argument types (<vector> expected)")
 	return new(a.x*b.x, a.y*b.y)
+end
+
+function vector.dot(a, b)
+    return a.x*b.x + a.y*b.y
 end
 
 function vector:len2()
@@ -174,8 +178,16 @@ function vector:trimInplace(maxLen)
 	return self
 end
 
+function vector:truncate(max)
+    if self:len() > max then
+        self:normalizeInplace()
+        self.x, self.y = self.x*max, self.y*max
+    end
+    return self
+end
+
 function vector:angle()
-    return atan(self.y, self.x)
+    return atan2(self.y, self.x)
 end
 
 function vector:angleTo(other)
@@ -186,7 +198,6 @@ end
 function vector:trimmed(maxLen)
 	return self:clone():trimInplace(maxLen)
 end
-
 
 -- the module
 return setmetatable({new = new, isvector = isvector, zero = zero},

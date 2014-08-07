@@ -146,6 +146,7 @@ __call = function(tween, self, len, subject, target, method, after, ...)
 	local payload, t, args = tween_collect_payload(subject, target, {}), 0, {...}
 
 	local last_s = 0
+    if type(len) == 'table' then len = utils.math.random(len[1], len[2]) end
 	return self:during(len, function(dt)
 		t = t + dt
 		local s = method(math.min(1, t/len), unpack(args))
