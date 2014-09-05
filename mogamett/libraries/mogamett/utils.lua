@@ -69,6 +69,30 @@ end
 -- table
 utils.table = {}
 
+utils.table.map = function(t, f)
+    local tbl = {}
+    for _, v in ipairs(t) do
+        table.insert(tbl, f(v))
+    end
+    return tbl
+end
+
+utils.table.slice = function(t, min, max)
+    local tbl = {}
+    for i = min, max do
+        table.insert(tbl, utils.table.copy(t[i])) 
+    end
+    return tbl
+end
+
+utils.table.equals = function(t1, t2)
+    if #t1 ~= #t2 then return false end
+    for i = 1, #t1 do
+        if t1[i] ~= t2[i] then return false end
+    end
+    return true
+end
+
 utils.table.toString = function(t)
     local str = "{"
     for k, v in pairs(t) do
@@ -166,6 +190,12 @@ utils.math.convertRange = function(old_value, old_min, old_max, new_min, new_max
 end
 
 -- misc
+utils.angleToDirection2 = function(angle)
+    angle = math.abs(angle)
+    if angle < math.pi/2 and angle >= 3*math.pi/2 then return 'right' end
+    if angle >= math.pi/2 and angle < 3*math.pi/2 then return 'left' end
+end
+
 utils.angleToDirection4 = function(angle)
     local pi = math.pi
     if angle >= pi/4 then angle = -2*pi+angle end

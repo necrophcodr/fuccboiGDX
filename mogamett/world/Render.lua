@@ -6,7 +6,11 @@ local Layer = require (mogamett_path .. '/world/Layer')
 function Render:renderNew()
     self.camera = self.mg.Camera(self.mg)
 
+    self.main_canvas = love.graphics.newCanvas(mg.screen_width, mg.screen_height)
+    self.main_canvas:setFilter('nearest', 'nearest')
+
     self.layers = {}
+    self.sortable_layers = {}
     self.layers_order = {'Default'}
     self:addLayer('Default')
 end
@@ -26,7 +30,7 @@ function Render:sortRenderOrder(order_function)
 end
 
 function Render:sortRenderOrderManual(order_function)
-    for _, layer_name in ipairs(self.layers_order) do
+    for _, layer_name in ipairs(self.sortable_layers) do
         self.layers[layer_name].entities = order_function(self.layers[layer_name].entities)
     end
 end
@@ -34,6 +38,8 @@ end
 function Render:addLayer(layer_name, settings)
     local settings = settings or {}
     self.layers[layer_name] = Layer(self, layer_name, settings) 
+    if settings.not_sortable then return end
+    table.insert(self.sortable_layers, layer_name)
 end
 
 function Render:addToLayer(layer_name, object)
@@ -74,13 +80,19 @@ function Render:renderDetach()
 end
 
 function Render:renderDraw()
-    -- Draw all layers
-    local bx, by = self.camera:getPosition()
-    for _, layer_name in ipairs(self.layers_order) do
-        self.camera.x = bx*self.layers[layer_name].parallax_scale
-        self.camera.y = by*self.layers[layer_name].parallax_scale
-        self.layers[layer_name]:draw()
-    end
+    -- Main canvas is game specific, remove when moving to Mogamett
+    self.main_canvas:clear()
+    self.main_canvas:renderTo(function()
+        -- Draw all layers
+        local bx, by = self.camera:getPosition()
+        for _, layer_name in ipairs(self.layers_order) do
+            self.camera.x = bx*self.layers[layer_name].parallax_scale
+            self.camera.y = by*self.layers[layer_name].parallax_scale
+            self.layers[layer_name]:draw()
+        end
+    end)
+
+    love.graphics.draw(self.main_canvas, 0, 0, 0, mg.screen_scale, mg.screen_scale)
 end
 
 return Render

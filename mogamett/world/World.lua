@@ -8,6 +8,8 @@ local Particle = require (mogamett_path .. '/world/Particle')
 local Tilemap = require (mogamett_path .. '/world/Tilemap')
 local Pool = require (mogamett_path .. '/world/Pool')
 
+local utils = require (mogamett_path .. '/libraries/mogamett/utils')
+
 local Class = require (mogamett_path .. '/libraries/classic/classic')
 local World = Class:extend()
 World:implement(Collision)
@@ -72,13 +74,18 @@ end
 
 function World:update(dt)
     if self.stopped then return end
+
     self:hitFrameStopUpdate(dt)
-    if self.frame_stopped then return end
-    for _, group in ipairs(self.groups) do group:update(dt) end
+    for _, group in ipairs(self.groups) do 
+        if self.frame_stopped then
+            if not utils.table.contains(self.groups_stopped, group.name) then group:update(dt) end
+        else group:update(dt) end
+    end
+
     for _, entity in ipairs(self.entities) do entity:update(dt) end
     self:particleUpdate(dt)
     self:renderUpdate(dt)
-    self.world:update(dt)
+    if not self.frame_stopped then self.world:update(dt) end
     self:createPostWorldStep()
     self:removePostWorldStep()
     for _, group in ipairs(self.groups) do group:removePostWorldStep() end

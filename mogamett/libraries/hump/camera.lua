@@ -86,7 +86,10 @@ function camera:zoomTo(zoom)
 end
 
 function camera:attach()
-	local cx, cy = love.graphics.getWidth()/(2*self.scale), love.graphics.getHeight()/(2*self.scale)
+    -- Original
+	-- local cx, cy = love.graphics.getWidth()/(2*self.scale), love.graphics.getHeight()/(2*self.scale)
+    -- Game specific, remove when moving to Mogamett
+	local cx, cy = love.graphics.getWidth()/(2*mg.screen_scale), love.graphics.getHeight()/(2*mg.screen_scale)
 	love.graphics.push()
 	love.graphics.scale(self.scale)
 	love.graphics.translate(cx, cy)
@@ -217,7 +220,9 @@ function camera:updateFollow(dt)
 end
 
 function camera:resize(w, h)
-    self:moveTo(self.target.x, self.target.y)
+    if self.target then
+        self:moveTo(self.target.x, self.target.y)
+    else self:moveTo(w/2, h/2) end
 end
 
 function camera:update(dt)

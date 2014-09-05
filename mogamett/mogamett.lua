@@ -23,9 +23,14 @@ mg.Class = require (mogamett_path .. '/libraries/classic/classic')
 mg.classes = {}
 mg.class = function(class_name, ...)
     local args = {...}
-    mg.classes[class_name] = mg[args[1]]:extend(class_name)
+    mg.classes[class_name] = (mg[args[1]] or mg.classes[args[1]]):extend(class_name)
     return mg.classes[class_name]
 end
+
+-- moses
+mg.moses = require (mogamett_path .. '/libraries/moses/moses')
+mg.fn = mg.moses
+mg.mo = mg.moses
 
 -- love-loader
 mg.Assets = {}
@@ -33,6 +38,9 @@ mg.Loader = require (mogamett_path .. '/libraries/love-loader/love-loader')
 
 -- lovebird
 mg.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
+
+-- lurker
+mg.lurker = require (mogamett_path .. '/libraries/lurker/lurker')
 
 -- UI
 require(string.gsub(mogamett_path, '/', '.') .. '.libraries.loveframes')
@@ -82,6 +90,7 @@ mg.uid = 0
 mg.path = nil
 mg.debug_draw = true
 mg.lovebird_enabled = false
+mg.lurker_enabled = false
 mg.min_width = 480
 mg.min_height = 360
 mg.screen_width = mg.min_wdith
@@ -93,10 +102,17 @@ mg.init = function()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     mg.screen_width = mg.min_width
     mg.screen_heigth = mg.min_height
+    love.window.setMode(mg.screen_width, mg.screen_height, {resizable = true})
     mg.world = mg.World(mg)
 end
 
+mg.setScreenSize = function(w, h)
+    love.window.setMode(w, h, {resizable = true})
+    mg.resize(w, h)
+end
+
 mg.resize = function(w, h)
+    mg.screen_scale = math.min(w/mg.min_width, h/mg.min_height)
     mg.screen_width = w
     mg.screen_height = h
     mg.world:resize(w, h)

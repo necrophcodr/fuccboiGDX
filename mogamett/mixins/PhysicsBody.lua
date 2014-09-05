@@ -117,6 +117,7 @@ function PhysicsBody:addJoint(name, type, ...)
 end
 
 function PhysicsBody:changeCollisionClass(name, collision_class)
+    if not self.fixtures[name] then return end -- fail silently or not? Same question for add/remove calls
     self.fixtures[name]:setCategory(unpack(self.world.mg.Collision.masks[collision_class].categories))
     self.fixtures[name]:setMask(unpack(self.world.mg.Collision.masks[collision_class].masks))
     self.fixtures[name]:setUserData({object = self, tag = collision_class})
@@ -125,10 +126,12 @@ function PhysicsBody:changeCollisionClass(name, collision_class)
 end
 
 function PhysicsBody:getGroupIndex(name)
+    if not self.fixtures[name] then return end
     return self.fixtures[name]:getGroupIndex()
 end
 
 function PhysicsBody:setGroupIndex(name, group_index)
+    if not self.fixtures[name] then return end
     self.fixtures[name]:setGroupIndex(group_index)
 end
 

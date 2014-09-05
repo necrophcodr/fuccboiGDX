@@ -4,19 +4,45 @@ input.__index = input
 local mappings = love.filesystem.read(mogamett_path .. '/resources/gamecontrollerdb.txt')
 love.joystick.loadGamepadMappings(mappings)
 
+local all_keys = {
+    "space", "return", "escape", "backspace", "tab", "space", "!", "\"", "#", "$", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4",
+    "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+    "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "capslock", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "printscreen",
+    "scrolllock", "pause", "insert", "home", "pageup", "delete", "end", "pagedown", "right", "left", "down", "up", "numlock", "kp/", "kp*", "kp-", "kp+", "kpenter",
+    "kp0", "kp1", "kp2", "kp3", "kp4", "kp5", "kp6", "kp7", "kp8", "kp9", "kp.", "kp,", "kp=", "application", "power", "f13", "f14", "f15", "f16", "f17", "f18", "f19",
+    "f20", "f21", "f22", "f23", "f24", "execute", "help", "menu", "select", "stop", "again", "undo", "cut", "copy", "paste", "find", "mute", "volumeup", "volumedown",
+    "alterase", "sysreq", "cancel", "clear", "prior", "return2", "separator", "out", "oper", "clearagain", "thsousandsseparator", "decimalseparator", "currencyunit",
+    "currencysubunit", "lctrl", "lshift", "lalt", "lgui", "rctrl", "rshift", "ralt", "rgui", "mode", "audionext", "audioprev", "audiostop", "audioplay", "audiomute",
+    "mediaselect", "brightnessdown", "brightnessup", "displayswitch", "kbdillumtoggle", "kbdillumdown", "kbdillumup", "eject", "sleep", "mouse1", "mouse2", "mouse3",
+    "mouse4", "mouse5", "wheelup", "wheeldown", "fdown", "fup", "fleft", "fright", "back", "guide", "start", "leftstick", "rightstick", "l1", "r1", "l2", "r2", "dpup",
+    "dpdown", "dpleft", "dpright", "leftx", "lefty", "rightx", "righty",
+}
+
 local function new()
-    return setmetatable({prev_state = {}, state = {}, binds = {}, joysticks = love.joystick.getJoysticks()}, input)
+    return setmetatable({prev_state = {}, state = {}, binds = {}, functions = {}, joysticks = love.joystick.getJoysticks()}, input)
 end
 
 function input:bind(key, action)
+    if type(action) == 'function' then self.functions[key] = action; return end
     if not self.binds[action] then self.binds[action] = {} end
     table.insert(self.binds[action], key)
 end
 
 function input:pressed(action)
-    for _, key in ipairs(self.binds[action]) do
-        if self.state[key] and not self.prev_state[key] then
-            return true
+    if action then
+        for _, key in ipairs(self.binds[action]) do
+            if self.state[key] and not self.prev_state[key] then
+                return true
+            end
+        end
+
+    else
+        for _, key in ipairs(all_keys) do
+            if self.state[key] and not self.prev_state[key] then
+                if self.functions[key] then
+                    self.functions[key]()
+                end
+            end
         end
     end
 end
@@ -73,6 +99,7 @@ local copy = function(t1)
 end
 
 function input:update(dt)
+    self:pressed()
     self.prev_state = copy(self.state)
     self.state['wheelup'] = false
     self.state['wheeldown'] = false
