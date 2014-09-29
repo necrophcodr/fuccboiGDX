@@ -1,6 +1,6 @@
 --[[------------------------------------------------
 	-- Love Frames - A GUI library for LOVE --
-	-- Copyright (c) 2012-2014 Kenny Shields --
+	-- Copyright (c) 2013 Kenny Shields --
 --]]------------------------------------------------
 
 -- numberbox object
@@ -32,10 +32,20 @@ function newobject:initialize()
 	input.parent = self
 	input:SetSize(50, 20)
 	input:SetUsable({"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "-"})
-	input:SetTabReplacement("")
 	input:SetText(self.value)
+    input:SetRepeatDelay(0.2)
 	input.OnTextChanged = function(object)
 		local value = self.value
+        if object.lines[1] == "" then 
+            self.value = 0
+            if self.OnValueChanged then self.OnValueChanged(self, self.value) end
+            return
+        end
+        if object.lines[1] == "-" then 
+            self.value = 0
+            if self.OnValueChanged then self.OnValueChanged(self, self.value) end
+            return
+        end
 		local newvalue = tonumber(object.lines[1])
 		if not newvalue then
 			self.value = value
@@ -46,16 +56,23 @@ function newobject:initialize()
 		if self.value > self.max then
 			self.value = self.max
 			object:SetText(self.value)
+            if self.OnValueChanged then self.OnValueChanged(self, self.value) end
 		end
 		if self.value < self.min then
 			self.value = self.min
 			object:SetText(self.value)
+            if self.OnValueChanged then self.OnValueChanged(self, self.value) end
 		end
+        if self.value == 0 then
+            self.value = 0
+            if self.OnValueChanged then self.OnValueChanged(self, self.value) end
+        end
 		if value ~= self.value then
 			if self.OnValueChanged then
 				self.OnValueChanged(self, self.value)
 			end
 		end
+        print(self.value)
 	end
 	input.Update = function(object)
 		object:SetSize(object.parent.width - 20, object.parent.height)
@@ -74,8 +91,13 @@ function newobject:initialize()
 		end
 	end
 	increasebutton.Update = function(object)
+		local loveversion = love._version
 		local time = 0
-		time = love.timer.getTime()
+		if loveversion == "0.8.0" then
+			time = love.timer.getMicroTime()
+		else
+			time = love.timer.getTime()
+		end
 		local delay = self.delay
 		local down = object.down
 		local canmodify = self.canmodify
@@ -109,8 +131,13 @@ function newobject:initialize()
 		end
 	end
 	decreasesbutton.Update = function(object)
+		local loveversion = love._version
 		local time = 0
-		time = love.timer.getTime()
+		if loveversion == "0.8.0" then
+			time = love.timer.getMicroTime()
+		else
+			time = love.timer.getTime()
+		end
 		local delay = self.delay
 		local down = object.down
 		local canmodify = self.canmodify
@@ -282,8 +309,6 @@ function newobject:SetValue(value)
 		onvaluechanged(self, value)
 	end
 	
-	return self
-	
 end
 
 --[[---------------------------------------------------------
@@ -303,8 +328,12 @@ end
 function newobject:SetIncreaseAmount(amount)
 
 	self.increaseamount = amount
-	return self
 	
+end
+
+
+function newobject:SetLimit(number)
+    self.internals[1]:SetLimit(number)
 end
 
 --[[---------------------------------------------------------
@@ -324,7 +353,6 @@ end
 function newobject:SetDecreaseAmount(amount)
 
 	self.decreaseamount = amount
-	return self
 	
 end
 
@@ -358,8 +386,6 @@ function newobject:SetMax(max)
 		end
 	end
 	
-	return self
-	
 end
 
 --[[---------------------------------------------------------
@@ -391,8 +417,6 @@ function newobject:SetMin(min)
 			onvaluechanged(self, min)
 		end
 	end
-	
-	return self
 	
 end
 
@@ -434,8 +458,6 @@ function newobject:SetMinMax(min, max)
 			onvaluechanged(self, min)
 		end
 	end
-	
-	return self
 	
 end
 
@@ -495,8 +517,6 @@ function newobject:ModifyValue(type)
 		end
 	end
 	
-	return self
-	
 end
 
 --[[---------------------------------------------------------
@@ -507,7 +527,6 @@ end
 function newobject:SetDecimals(decimals)
 
 	self.decimals = decimals
-	return self
 	
 end
 

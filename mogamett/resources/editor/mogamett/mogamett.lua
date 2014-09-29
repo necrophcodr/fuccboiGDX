@@ -80,6 +80,8 @@ mg.gamepadpressed = function(joystick, button) mg.input:gamepadpressed(joystick,
 mg.gamepadreleased = function(joystick, button) mg.input:gamepadreleased(joystick, button) end
 mg.gamepadaxis = function(joystick, axis, newvalue) mg.input:gamepadaxis(joystick, axis, newvalue) end
 
+mg.textinput = function(text) mg.loveframes.textinput(text) end
+
 -- collision, holds global collision data (mostly who should ignore who and callback settings)
 mg.Collision = require (mogamett_path .. '/libraries/mogamett/collision')(mg)
 
