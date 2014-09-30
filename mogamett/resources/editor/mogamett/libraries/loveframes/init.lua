@@ -16,8 +16,8 @@ loveframes.stage = "Alpha"
 -- library configurations
 loveframes.config = {}
 loveframes.config["DIRECTORY"] = nil
-loveframes.config["DEFAULTSKIN"] = "Gray"
-loveframes.config["ACTIVESKIN"] = "Gray"
+loveframes.config["DEFAULTSKIN"] = "Blue"
+loveframes.config["ACTIVESKIN"] = "Blue"
 loveframes.config["INDEXSKINIMAGES"] = true
 loveframes.config["DEBUG"] = false
 

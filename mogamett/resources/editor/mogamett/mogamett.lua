@@ -42,45 +42,62 @@ mg.lovebird = require (mogamett_path .. '/libraries/lovebird/lovebird')
 -- lurker
 mg.lurker = require (mogamett_path .. '/libraries/lurker/lurker')
 
--- UI
-require(string.gsub(mogamett_path, '/', '.') .. '.libraries.loveframes')
-mg.loveframes = loveframes
-
 -- input
 mg.Input = require (mogamett_path .. '/libraries/mogamett/input')
 mg.input = mg.Input()
 
+-- UI
+mg.ui = require (mogamett_path .. '/libraries/mogamett/ui/ui')
+require(string.gsub(mogamett_path, '/', '.') .. '.libraries.loveframes')
+mg.loveframes = loveframes
+
 mg.textinput = function(text)
+    mg.input:textinput(text)
+    mg.ui.input:textinput(text)
     mg.loveframes.textinput(text)
 end
 
 mg.keypressed = function(key) 
     mg.input:keypressed(key) 
+    mg.ui.input:keypressed(key)
     mg.loveframes.keypressed(key)
 end
 
 mg.keyreleased = function(key) 
     mg.input:keyreleased(key) 
+    mg.ui.input:keyreleased(key)
+    mg.loveframes.keypressed(key)
     mg.loveframes.keyreleased(key)
 end
 
 mg.mousepressed = function(button) 
     mg.input:mousepressed(button) 
+    mg.ui.input:mousepressed(button)
     local x, y = love.mouse.getPosition()
     mg.loveframes.mousepressed(x, y, button)
 end
 
 mg.mousereleased = function(button) 
     mg.input:mousereleased(button) 
+    mg.ui.input:mousereleased(button) 
     local x, y = love.mouse.getPosition()
     mg.loveframes.mousereleased(x, y, button)
 end
 
-mg.gamepadpressed = function(joystick, button) mg.input:gamepadpressed(joystick, button) end
-mg.gamepadreleased = function(joystick, button) mg.input:gamepadreleased(joystick, button) end
-mg.gamepadaxis = function(joystick, axis, newvalue) mg.input:gamepadaxis(joystick, axis, newvalue) end
+mg.gamepadpressed = function(joystick, button) 
+    mg.input:gamepadpressed(joystick, button) 
+    mg.ui.input:gamepadpressed(joystick, button) 
+end
 
-mg.textinput = function(text) mg.loveframes.textinput(text) end
+mg.gamepadreleased = function(joystick, button) 
+    mg.input:gamepadreleased(joystick, button) 
+    mg.ui.input:gamepadreleased(joystick, button) 
+end
+
+mg.gamepadaxis = function(joystick, axis, newvalue) 
+    mg.input:gamepadaxis(joystick, axis, newvalue) 
+    mg.ui.input:gamepadaxis(joystick, axis, newvalue) 
+end
 
 -- collision, holds global collision data (mostly who should ignore who and callback settings)
 mg.Collision = require (mogamett_path .. '/libraries/mogamett/collision')(mg)
@@ -185,7 +202,7 @@ mg.run = function()
         -- Call update and draw
         accumulator = accumulator + dt
         while accumulator >= fixed_dt do
-            if love.update then love.update(fixed_dt); mg.input:update(dt) end
+            if love.update then love.update(fixed_dt); mg.input:update(dt); mg.ui.input:update(dt) end
             accumulator = accumulator - fixed_dt
         end
 
