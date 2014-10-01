@@ -16,7 +16,7 @@ function Editor:new()
     self.menus = Menus(self)
 
     self.element = mg.ui.Element({x = 400, y = 300, w = 150, h = 150})
-    -- self.button_test = mg.ui.Button({x = 400, y = 300, w = 100, h = 30, text = 'Button', action = function(button) print(1) end})
+    self.element:addChild(mg.ui.Button({x = 5, y = 5, w = 80, h = 30, text = 'Button', action = function(button) print(1) end}))
 end
 
 function Editor:update(dt)
