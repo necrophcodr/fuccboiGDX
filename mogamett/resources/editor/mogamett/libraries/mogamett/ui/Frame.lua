@@ -1,8 +1,9 @@
-local Element = mg.Class:extend('Element')
+local Frame = mg.Class:extend('Frame')
 
 local utils = require (mogamett_path .. '/libraries/mogamett/ui/utils')
+local config = require (mogamett_path .. '/libraries/mogamett/ui/config')
 
-function Element:new(settings)
+function Frame:new(settings)
     local settings = settings or {}
     self.x = settings.x or 0
     self.y = settings.y or 0
@@ -11,22 +12,26 @@ function Element:new(settings)
 
     self.hot = false
     self.down = false
-    self.draggable = true
     self.selected = false
     self.selected_child_index = 0
+
+    self.title_bar_height = 20
+    self.title_bar_text = mg.Text(settings.text or 'Default', {font = settings.font or config.default_font_bold})
 
     self.children = {}
 
     self.last_x, self.last_y = 0, 0
 end
 
-function Element:addChild(object)
-    object.x_offset, object.y_offset = object.x, object.y
+function Frame:addChild(object)
+    object.x_offset, object.y_offset = object.x, object.y + self.title_bar_height
     object.x, object.y = self.x + object.x, self.y + object.y
     table.insert(self.children, object)
 end
 
-function Element:select()
+function Frame:select()
+    self.title_bar_text:update(dt)
+
     local anyChildSelected = function()
         for _, child in ipairs(self.children) do
             if child.selected then return true end
@@ -35,7 +40,7 @@ function Element:select()
 
     if self.selected or anyChildSelected() then
         self.selected = false
-        -- Element -> first child
+        -- Frame -> first child
         if self.selected_child_index == 0 then 
             self.children[1]:select()
             self.selected_child_index = 1
@@ -52,27 +57,25 @@ function Element:select()
     else self.selected = true end
 end
 
-function Element:update(dt)
+function Frame:update(dt)
     for _, child in ipairs(self.children) do
         if (child.hot or child.down) then child:update(dt); return end
     end
 
     -- Hot
-    if utils.mouseColliding(self.x, self.y, self.w, self.h) then self.hot = true
+    if utils.mouseColliding(self.x, self.y, self.w, self.title_bar_height) then self.hot = true
     else self.hot = false end
 
-    if self.draggable then
-        -- Drag
-        if (self.hot or self.down) and mg.ui.input:down('activate') then 
-            self.down = true
-            local mx, my = love.mouse.getPosition()
-            local dx, dy = mx - self.last_x, my - self.last_y
-            self.x, self.y = self.x + dx, self.y + dy
-        end
-
-        -- Undrag
-        if self.down and mg.ui.input:released('activate') then self.down = false end
+    -- Drag
+    if (self.hot or self.down) and mg.ui.input:down('activate') then 
+        self.down = true
+        local mx, my = love.mouse.getPosition()
+        local dx, dy = mx - self.last_x, my - self.last_y
+        self.x, self.y = self.x + dx, self.y + dy
     end
+
+    -- Undrag
+    if self.down and mg.ui.input:released('activate') then self.down = false end
 
     -- Children update
     for _, child in ipairs(self.children) do 
@@ -83,9 +86,9 @@ function Element:update(dt)
     self.last_x, self.last_y = love.mouse.getPosition()
 end
 
-function Element:draw()
-    mg.ui.style.elementDraw(self)
+function Frame:draw()
+    mg.ui.style.frameDraw(self)
     for _, child in ipairs(self.children) do child:draw() end
 end
 
-return Element
+return Frame
