@@ -19,7 +19,7 @@ local all_keys = {
 }
 
 local function new()
-    return setmetatable({prev_state = {}, state = {}, binds = {}, functions = {}, joysticks = love.joystick.getJoysticks()}, input)
+    return setmetatable({prev_state = {}, state = {}, binds = {}, functions = {}, joysticks = love.joystick.getJoysticks(), text = ''}, input)
 end
 
 function input:bind(key, action)
@@ -103,6 +103,7 @@ function input:update(dt)
     self.prev_state = copy(self.state)
     self.state['wheelup'] = false
     self.state['wheeldown'] = false
+    self.text = ''
 end
 
 function input:keypressed(key)
@@ -139,6 +140,14 @@ local button_to_axis = {leftx = 'leftx', lefty = 'lefty', rightx = 'rightx', rig
 
 function input:gamepadaxis(joystick, axis, newvalue)
     self.state[button_to_axis[axis]] = newvalue
+end
+
+function input:textinput(text)
+    self.text = text
+end
+
+function input:getText()
+    return self.text
 end
 
 return setmetatable({new = new}, {__call = function(_, ...) return new(...) end})

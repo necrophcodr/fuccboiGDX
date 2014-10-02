@@ -12,7 +12,7 @@ function Checkbox:new(settings)
 
     self.hot = false
     self.selected = false
-    self.enabled = true
+    self.enabled = true 
     self.checked = false
     self.down = false
 

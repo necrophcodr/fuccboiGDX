@@ -32,9 +32,15 @@ function Element:select()
             if child.selected then return true end
         end
     end
-
+    
     if self.selected or anyChildSelected() then
         self.selected = false
+
+        -- Continue from selected child if its been selected with the mouse (textfield)
+        for i, child in ipairs(self.children) do
+            if child.selected then self.selected_child_index = i end
+        end
+
         -- Element -> first child
         if self.selected_child_index == 0 then 
             self.children[1]:select()
@@ -53,8 +59,20 @@ function Element:select()
 end
 
 function Element:update(dt)
-    for _, child in ipairs(self.children) do
-        if (child.hot or child.down) then child:update(dt); return end
+
+    for i, child in ipairs(self.children) do
+        if (child.hot or child.down) then 
+            -- Unselect all other selected children if another element is activated
+            if mg.ui.input:released('activate') then
+                for j, v in ipairs(self.children) do 
+                    if i ~= j then v.selected = false end
+                end
+            end
+            -- Force top only element to be activated; for instance, an element won't be dragged
+            -- if a button on top of it is press + dragged.
+            child:update(dt)
+            return
+        end
     end
 
     -- Hot

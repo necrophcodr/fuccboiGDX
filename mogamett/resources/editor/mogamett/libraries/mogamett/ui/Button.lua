@@ -26,17 +26,17 @@ function Button:select()
 end
 
 function Button:update(dt)
-    if self.enabled then
-        self.text:update(dt)
+    if not self.enabled then return end
 
-        if utils.mouseColliding(self.x, self.y, self.w, self.h) then self.hot = true
-        else self.hot = false end
+    self.text:update(dt)
 
-        if ((self.hot and self.down) or self.selected) and mg.ui.input:released('activate') then self:action() end
+    if utils.mouseColliding(self.x, self.y, self.w, self.h) then self.hot = true
+    else self.hot = false end
 
-        if ((self.hot or self.down) or self.selected) and mg.ui.input:down('activate') then self.down = true
-        else self.down = false end
-    end
+    if ((self.hot and self.down) or self.selected) and mg.ui.input:released('activate') then self:action() end
+
+    if ((self.hot or self.down) or self.selected) and mg.ui.input:down('activate') then self.down = true
+    else self.down = false end
 end
 
 function Button:draw()

@@ -13,6 +13,47 @@ s.white_disabled = {128, 128, 128}
 s.yellow = {238, 208, 119}
 s.blue = {80, 128, 222}
 
+-- Textfield:
+--
+-- States:
+--      .hot: when the mouse is hovering over or not
+--      .selected: when selected with the keyboard (tab)
+--      .enabled: when the checkbox is enabled or not
+--
+-- Relevant attributes:
+--      .x, .y, .w, .h: textfield dimensions
+--      .text: textfield text
+--
+s.textfieldDraw = function(textfield)
+    if textfield.enabled then
+        if textfield.hot or textfield.selected then
+            love.graphics.setColor(unpack(s.gray_light_hover))
+            love.graphics.rectangle('fill', textfield.x, textfield.y, textfield.w, textfield.h)
+        else
+            love.graphics.setColor(unpack(s.gray_light))
+            love.graphics.rectangle('fill', textfield.x, textfield.y, textfield.w, textfield.h)
+        end
+
+        if textfield.selected then
+            if textfield.cursor_visible then
+                love.graphics.setColor(unpack(s.white))
+                love.graphics.line(textfield.x + 5, textfield.y + 5, textfield.x + 5, textfield.y + textfield.h - 5)
+            end
+            love.graphics.setColor(unpack(s.blue))
+            love.graphics.rectangle('line', textfield.x, textfield.y, textfield.w, textfield.h)
+        end
+    else
+        love.graphics.setColor(unpack(s.gray_light_disabled))
+        love.graphics.rectangle('fill', textfield.x, textfield.y, textfield.w, textfield.h)
+    end
+
+    -- Text
+    love.graphics.setColor(unpack(s.white))
+    if not textfield.enabled then love.graphics.setColor(unpack(s.white_disabled)) end
+
+    love.graphics.setColor(255, 255, 255)
+end
+
 -- Checkbox:
 --
 -- States:
