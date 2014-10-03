@@ -14,6 +14,7 @@ function Textfield:new(settings)
     self.down = false
     self.selected = false
     self.enabled = true
+    self.focused = false
 
     self.delete_delay = 0.03
     self.can_delete = true
@@ -29,23 +30,22 @@ function Textfield:new(settings)
 end
 
 function Textfield:select()
-    if self.selected then self.selected = false
-    else self.selected = true end
+    if self.selected then self.selected = false; self.focused = false
+    else self.selected = true; self.focused = true end
 end
 
 function Textfield:update(dt)
     if not self.enabled then return end
-    if not self.selected then return end
 
     self.text = self.text .. mg.ui.input:getText()
 
     if utils.mouseColliding(self.x, self.y, self.w, self.h) then self.hot = true
     else self.hot = false end
 
-    if self.hot and mg.ui.input:released('activate') then self.selected = true end
-    if not self.hot and mg.ui.input:released('activate') then self.selected = false end
+    if self.hot and mg.ui.input:released('mouse1') then self.focused = true end
+    if not self.hot and mg.ui.input:released('mouse1') then self.selected = false; self.focused = false end
 
-    if ((self.hot or self.down) or self.selected) and mg.ui.input:down('activate') then self.down = true
+    if ((self.hot or self.down) and mg.ui.input:down('mouse1')) or (self.selected and mg.ui.input:down('return')) then self.down = true
     else self.down = false end
 
     -- Character deletion
@@ -70,7 +70,7 @@ function Textfield:update(dt)
     self.cursor_blink_timer = self.cursor_blink_timer + dt
     if self.cursor_blink_timer > self.cursor_blink_rate then
         self.cursor_blink_timer = 0
-        if self.selected then self.cursor_visible = not self.cursor_visible end
+        if self.focused then self.cursor_visible = not self.cursor_visible end
     end
 end
 

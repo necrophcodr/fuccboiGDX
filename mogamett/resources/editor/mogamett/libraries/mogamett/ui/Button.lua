@@ -33,9 +33,9 @@ function Button:update(dt)
     if utils.mouseColliding(self.x, self.y, self.w, self.h) then self.hot = true
     else self.hot = false end
 
-    if ((self.hot and self.down) or self.selected) and mg.ui.input:released('activate') then self:action() end
+    if (self.hot and self.down and mg.ui.input:released('mouse1')) or (self.selected and mg.ui.input:released('return')) then self:action() end
 
-    if ((self.hot or self.down) or self.selected) and mg.ui.input:down('activate') then self.down = true
+    if ((self.hot or self.down) and mg.ui.input:down('mouse1')) or (self.selected and mg.ui.input:down('return')) then self.down = true
     else self.down = false end
 end
 

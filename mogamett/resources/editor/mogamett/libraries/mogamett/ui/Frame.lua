@@ -67,7 +67,7 @@ function Frame:update(dt)
     else self.hot = false end
 
     -- Drag
-    if (self.hot or self.down) and mg.ui.input:down('activate') then 
+    if (self.hot or self.down) and mg.ui.input:down('mouse1') then 
         self.down = true
         local mx, my = love.mouse.getPosition()
         local dx, dy = mx - self.last_x, my - self.last_y
@@ -75,7 +75,7 @@ function Frame:update(dt)
     end
 
     -- Undrag
-    if self.down and mg.ui.input:released('activate') then self.down = false end
+    if self.down and mg.ui.input:released('mouse1') then self.down = false end
 
     -- Children update
     for _, child in ipairs(self.children) do 

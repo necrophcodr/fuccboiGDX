@@ -35,12 +35,15 @@ s.textfieldDraw = function(textfield)
         end
 
         if textfield.selected then
+            love.graphics.setColor(unpack(s.blue))
+            love.graphics.rectangle('line', textfield.x, textfield.y, textfield.w, textfield.h)
+        end
+
+        if textfield.focused or textfield.selected then
             if textfield.cursor_visible then
                 love.graphics.setColor(unpack(s.white))
                 love.graphics.line(textfield.x + 5, textfield.y + 5, textfield.x + 5, textfield.y + textfield.h - 5)
             end
-            love.graphics.setColor(unpack(s.blue))
-            love.graphics.rectangle('line', textfield.x, textfield.y, textfield.w, textfield.h)
         end
     else
         love.graphics.setColor(unpack(s.gray_light_disabled))

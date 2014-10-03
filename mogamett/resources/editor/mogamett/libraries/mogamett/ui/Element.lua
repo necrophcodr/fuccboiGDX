@@ -36,11 +36,6 @@ function Element:select()
     if self.selected or anyChildSelected() then
         self.selected = false
 
-        -- Continue from selected child if its been selected with the mouse (textfield)
-        for i, child in ipairs(self.children) do
-            if child.selected then self.selected_child_index = i end
-        end
-
         -- Element -> first child
         if self.selected_child_index == 0 then 
             self.children[1]:select()
@@ -59,17 +54,10 @@ function Element:select()
 end
 
 function Element:update(dt)
-
+    -- Force top only element to be activated; for instance, an element won't be dragged
+    -- if a button on top of it is press + dragged.
     for i, child in ipairs(self.children) do
         if (child.hot or child.down) then 
-            -- Unselect all other selected children if another element is activated
-            if mg.ui.input:released('activate') then
-                for j, v in ipairs(self.children) do 
-                    if i ~= j then v.selected = false end
-                end
-            end
-            -- Force top only element to be activated; for instance, an element won't be dragged
-            -- if a button on top of it is press + dragged.
             child:update(dt)
             return
         end
@@ -81,7 +69,7 @@ function Element:update(dt)
 
     if self.draggable then
         -- Drag
-        if (self.hot or self.down) and mg.ui.input:down('activate') then 
+        if (self.hot or self.down) and mg.ui.input:down('mouse1') then 
             self.down = true
             local mx, my = love.mouse.getPosition()
             local dx, dy = mx - self.last_x, my - self.last_y
@@ -89,7 +77,7 @@ function Element:update(dt)
         end
 
         -- Undrag
-        if self.down and mg.ui.input:released('activate') then self.down = false end
+        if self.down and mg.ui.input:released('mouse1') then self.down = false end
     end
 
     -- Children update
