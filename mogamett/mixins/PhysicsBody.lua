@@ -1,17 +1,17 @@
 local Class = require (mogamett_path .. '/libraries/classic/classic')
 local PhysicsBody = Class:extend()  
 
-function PhysicsBody:physicsBodyNew(world, x, y, settings)
+function PhysicsBody:physicsBodyNew(area, x, y, settings)
     self.bodies = {}
     self.shapes = {}
     self.fixtures = {}
     self.sensors = {}
     self.joints = {}
 
-    self:addBody(world, x, y, settings)
+    self:addBody(area, x, y, settings)
 end
 
-function PhysicsBody:addBody(world, x, y, settings)
+function PhysicsBody:addBody(area, x, y, settings)
     -- Set name to main if there isn't one and/or remove previous physics names if they already exist
     local settings = settings or {}
     settings.physics_name = settings.physics_name or 'main'
@@ -19,7 +19,7 @@ function PhysicsBody:addBody(world, x, y, settings)
     if self.bodies[name] then self:removeBody(name) end
 
     -- Define body
-    local body = love.physics.newBody(world.world, x, y, settings.body_type or 'dynamic')
+    local body = love.physics.newBody(area.world, x, y, settings.body_type or 'dynamic')
     body:setFixedRotation(true)
 
     -- Define shape
@@ -58,8 +58,8 @@ function PhysicsBody:addBody(world, x, y, settings)
     -- Define collision classes and attach them to fixture and sensor
     local mask_name = settings.collision_class or self.class_name
     local fixture = love.physics.newFixture(body, shape)
-    fixture:setCategory(unpack(self.world.mg.Collision.masks[mask_name].categories))
-    fixture:setMask(unpack(self.world.mg.Collision.masks[mask_name].masks))
+    fixture:setCategory(unpack(self.area.world.mg.Collision.masks[mask_name].categories))
+    fixture:setMask(unpack(self.area.world.mg.Collision.masks[mask_name].masks))
     fixture:setUserData({object = self, tag = mask_name})
     local sensor = love.physics.newFixture(body, shape)
     sensor:setSensor(true)
@@ -118,8 +118,8 @@ end
 
 function PhysicsBody:changeCollisionClass(name, collision_class)
     if not self.fixtures[name] then return end -- fail silently or not? Same question for add/remove calls
-    self.fixtures[name]:setCategory(unpack(self.world.mg.Collision.masks[collision_class].categories))
-    self.fixtures[name]:setMask(unpack(self.world.mg.Collision.masks[collision_class].masks))
+    self.fixtures[name]:setCategory(unpack(self.area.world.mg.Collision.masks[collision_class].categories))
+    self.fixtures[name]:setMask(unpack(self.area.world.mg.Collision.masks[collision_class].masks))
     self.fixtures[name]:setUserData({object = self, tag = collision_class})
     self.sensors[name]:setSensor(true)
     self.sensors[name]:setUserData({object = self, tag = collision_class})
@@ -141,7 +141,7 @@ end
 
 function PhysicsBody:physicsBodyDraw()
     self.x, self.y = self.body:getPosition()
-    if not self.world.mg.debug_draw then return end
+    if not self.area.world.mg.debug_draw then return end
 
     for name, body in pairs(self.bodies) do
         if self.shapes[name]:type() == 'PolygonShape' then

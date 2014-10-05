@@ -86,10 +86,11 @@ function camera:zoomTo(zoom)
 end
 
 function camera:attach()
-    -- Original
-	-- local cx, cy = love.graphics.getWidth()/(2*self.scale), love.graphics.getHeight()/(2*self.scale)
-    -- Game specific, remove when moving to Mogamett
-	local cx, cy = love.graphics.getWidth()/(2*mg.screen_scale), love.graphics.getHeight()/(2*mg.screen_scale)
+    local cx, cy = 0, 0
+    if mg.world.render_mode == 'canvas' then 
+        cx, cy = love.graphics.getWidth()/(2*mg.screen_scale), love.graphics.getHeight()/(2*mg.screen_scale)
+    else cx, cy = love.graphics.getWidth()/(2*self.scale), love.graphics.getHeight()/(2*self.scale) end
+
 	love.graphics.push()
 	love.graphics.scale(self.scale)
 	love.graphics.translate(cx, cy)

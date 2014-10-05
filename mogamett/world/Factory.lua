@@ -44,7 +44,7 @@ function Factory:createPostWorldStep()
                 entity = self.mg.classes[o.type](self, o.x, o.y, o.settings) 
                 if entity then
                     self:addToGroup(o.type, entity)
-                    self:addToLayer(self.mg.classes[o.type].layer or 'Default', entity)
+                    self.mg.world:addToLayer(self.mg.classes[o.type].layer or 'Default', entity)
                 end
             end
         end

@@ -1,13 +1,13 @@
 local collision = {}
 collision.__index = collision
 
-local function new(mm)
-    return setmetatable({masks = {}, mm = mm}, collision)
+local function new(mg)
+    return setmetatable({masks = {}, mg = mg}, collision)
 end
 
 function collision:generateCategoriesMasks()
     local collision_ignores = {}
-    for class_name, class in pairs(self.mm.classes) do
+    for class_name, class in pairs(self.mg.classes) do
         collision_ignores[class_name] = class.ignores or {}
     end
     local incoming = {}
@@ -93,7 +93,7 @@ end
 
 function collision:getCollisionCallbacksTable()
     local collision_table = {}
-    for class_name, class in pairs(self.mm.classes) do
+    for class_name, class in pairs(self.mg.classes) do
         collision_table[class_name] = {}
         local class_collision_enter = class.enter or {}
         for _, v in ipairs(class_collision_enter) do

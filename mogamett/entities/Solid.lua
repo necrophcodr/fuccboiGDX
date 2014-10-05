@@ -3,9 +3,9 @@ local PhysicsBody = require (mogamett_path .. '/mixins/PhysicsBody')
 local Solid = Entity:extend('Solid')
 Solid:implement(PhysicsBody)
 
-function Solid:new(world, x, y, settings)
-    Solid.super.new(self, world, x, y, settings)
-    self:physicsBodyNew(world, x, y, settings)
+function Solid:new(area, x, y, settings)
+    Solid.super.new(self, area, x, y, settings)
+    self:physicsBodyNew(area, x, y, settings)
 end
 
 function Solid:update(dt)

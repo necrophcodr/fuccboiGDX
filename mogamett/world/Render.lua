@@ -4,15 +4,20 @@ local Render = Class:extend()
 local Layer = require (mogamett_path .. '/world/Layer')
 
 function Render:renderNew()
-    self.camera = self.mg.Camera(self.mg)
+    self.camera = self.mg.Camera()
 
-    self.main_canvas = love.graphics.newCanvas(mg.screen_width, mg.screen_height)
+    self.main_canvas = love.graphics.newCanvas(self.mg.screen_width, self.mg.screen_height)
     self.main_canvas:setFilter('nearest', 'nearest')
+    self.render_mode = 'canvas'
 
     self.layers = {}
     self.sortable_layers = {}
     self.layers_order = {'Default'}
     self:addLayer('Default')
+end
+
+function Render:setRenderMode(render_mode)
+    self.render_mode = render_mode 
 end
 
 function Render:setLayerOrder(layers_order)
@@ -80,9 +85,20 @@ function Render:renderDetach()
 end
 
 function Render:renderDraw()
-    -- Main canvas is game specific, remove when moving to Mogamett
-    self.main_canvas:clear()
-    self.main_canvas:renderTo(function()
+    if self.render_mode == 'canvas' then
+        self.main_canvas:clear()
+        self.main_canvas:renderTo(function()
+            -- Draw all layers
+            local bx, by = self.camera:getPosition()
+            for _, layer_name in ipairs(self.layers_order) do
+                self.camera.x = bx*self.layers[layer_name].parallax_scale
+                self.camera.y = by*self.layers[layer_name].parallax_scale
+                self.layers[layer_name]:draw()
+            end
+        end)
+
+        love.graphics.draw(self.main_canvas, 0, 0, 0, self.mg.screen_scale, self.mg.screen_scale)
+    else
         -- Draw all layers
         local bx, by = self.camera:getPosition()
         for _, layer_name in ipairs(self.layers_order) do
@@ -90,9 +106,7 @@ function Render:renderDraw()
             self.camera.y = by*self.layers[layer_name].parallax_scale
             self.layers[layer_name]:draw()
         end
-    end)
-
-    love.graphics.draw(self.main_canvas, 0, 0, 0, mg.screen_scale, mg.screen_scale)
+    end
 end
 
 return Render
