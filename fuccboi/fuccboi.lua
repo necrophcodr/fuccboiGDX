@@ -13,6 +13,7 @@ fg.Text = require (fuccboi_path .. '/libraries/fuccboi/Text')
 fg.Group = require (fuccboi_path .. '/world/Group')
 fg.Object = require (fuccboi_path .. '/libraries/classic/classic')
 fg.Sound = require (fuccboi_path .. '/libraries/TEsound/TEsound')
+fg.Serial = require (fuccboi_path .. '/libraries/fuccboi/Serial')()
 
 -- holds all classes created with the fg.Class call
 fg.classes = {}

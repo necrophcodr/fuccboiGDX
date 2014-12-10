@@ -73,4 +73,26 @@ function World:resize(w, h)
     self:renderResize(w, h)
 end
 
+-- mg.world -> mg.world.areas['Default'] redirects
+function World:createEntity(...) self.areas['Default']:createEntity(...) end
+function World:createEntityImmediate(...) return self.areas['Default']:createEntityImmediate(...) end
+function World:hitFrameStopAdd(...) self.areas['Default']:hitFrameStopAdd(...) end
+function World:getEntitiesBy(...) return self.areas['Default']:getEntitiesBy(...) end
+function World:queryClosestAreaCircle(...) return self.areas['Default']:queryClosestAreaCircle(...) end
+function World:queryAreaCircle(...) return self.areas['Default']:queryAreaCircle(...) end
+function World:queryAreaRectangle(...) return self.areas['Default']:queryAreaRectangle(...) end
+function World:queryAreaLine(...) return self.areas['Default']:queryAreaLine(...) end
+function World:queryAreaPolygon(...) return self.areas['Default']:queryAreaPolygon(...) end
+function World:applyAreaCircle(...) self.areas['Default']:applyAreaCircle(...) end
+function World:applyAreaRectangle(...) self.areas['Default']:applyAreaRectangle(...) end
+function World:applyAreaLine(...) self.areas['Default']:applyAreaLine(...) end
+function World:applyAreaPolygon(...) self.areas['Default']:applyAreaPolygon(...) end
+function World:createTiledMapEntities(...) self.areas['Default']:createTiledMapEntities(...) end
+function World:generateCollisionSolids(...) self.areas['Default']:generateCollisionSolids(...) end
+function World:spawnParticles(...) self.areas['Default']:spawnParticles(...) end
+function World:save(...) self.areas['Default']:save(...) end
+function World:load(...) self.areas['Default']:load(...) end
+function World:activate(...) self.areas['Default']:activate(...) end
+function World:deactivate(...) self.areas['Default']:deactivate(...) end
+
 return World

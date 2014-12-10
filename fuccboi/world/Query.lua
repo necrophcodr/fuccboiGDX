@@ -5,7 +5,23 @@ function Query:queryNew()
 
 end
 
-function Query:queryClosestAreaCircle(ids, position, radius, object_types)
+function Query:getEntitiesBy(key, value, object_types)
+    local entities = {} 
+    for _, type in ipairs(object_types) do
+        for _, group in ipairs(self.groups) do
+            if group.name == type then
+                for _, object in ipairs(group:getEntities()) do
+                    if object[key] == value then
+                        table.insert(entities, object)
+                    end
+                end
+            end
+        end
+    end
+    return entities
+end
+
+function Query:queryClosestAreaCircle(ids, x, y, radius, object_types)
     local out_object = nil
     local min_distance = 100000
     for _, type in ipairs(object_types) do
@@ -13,8 +29,8 @@ function Query:queryClosestAreaCircle(ids, position, radius, object_types)
             if group.name == type then
                 for _, object in ipairs(group:getEntities()) do
                     if not self.fg.fn.contains(ids, object.id) then
-                        local x, y = object.body:getPosition()
-                        local dx, dy = math.abs(position.x - x), math.abs(position.y - y)
+                        local _x, _y = object.body:getPosition()
+                        local dx, dy = math.abs(x - _x), math.abs(y - _y)
                         local distance = math.sqrt(dx*dx + dy*dy)
                         if distance < min_distance and distance < radius then 
                             min_distance = distance 
@@ -65,7 +81,7 @@ function Query:queryAreaRectangle(x, y, w, h, object_types)
     return objects
 end
 
-function Query:queryLine(x1, y1, x2, y2, object_types)
+function Query:queryAreaLine(x1, y1, x2, y2, object_types)
     local objects = {}
     for _, type in ipairs(object_types) do
         for _, group in ipairs(self.groups) do
