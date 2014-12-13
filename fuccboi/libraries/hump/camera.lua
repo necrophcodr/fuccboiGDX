@@ -32,6 +32,7 @@ Camera.__index = Camera
 
 local utils = require (fuccboi_path .. '/libraries/fuccboi/utils')
 local Vector = require (fuccboi_path .. '/libraries/hump/vector')
+local fn = require (fuccboi_path .. '/libraries/moses/moses')
 
 function Camera.new(settings)
     local settings = settings or {}
@@ -118,7 +119,7 @@ function Camera:shake(intensity, duration, settings)
 end
 
 function Camera:shakeRemove(id)
-    table.remove(self.shakes, utils.findIndexById(self.shakes, id))
+    table.remove(self.shakes, fn.find(self.shakes, {id = id}))
 end
 
 function Camera:updateShake(dt)
