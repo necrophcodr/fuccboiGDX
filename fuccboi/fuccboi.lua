@@ -125,6 +125,7 @@ fg.Shaders = {}
 fg.PhysicsBody = require (fuccboi_path .. '/mixins/PhysicsBody')
 
 fg.getPS = function(name)
+    local image = love.graphics.newImage(fuccboi_path .. '/resources/particles/sperm/square.png')
     local ps_data = require (fuccboi_path .. '/resources/particles/sperm/' .. name)
     local particle_settings = {}
     particle_settings["colors"] = {}
@@ -141,7 +142,7 @@ fg.getPS = function(name)
             for i = 1, #v do particle_settings["sizes"][i] = v[i] end
         else particle_settings[k] = v end
     end
-    local ps = love.graphics.newParticleSystem(self.image, particle_settings["buffer_size"])
+    local ps = love.graphics.newParticleSystem(image, particle_settings["buffer_size"])
     ps:setAreaSpread(string.lower(particle_settings["area_spread_distribution"]), particle_settings["area_spread_dx"] or 0, 
                      particle_settings["area_spread_dy"] or 0)
     ps:setBufferSize(particle_settings["buffer_size"] or 1)
