@@ -83,7 +83,7 @@ fg.debug_draw = true
 fg.lovebird_enabled = false
 fg.min_width = 480
 fg.min_height = 360
-fg.screen_width = fg.min_wdith
+fg.screen_width = fg.min_width
 fg.screen_height = fg.min_height
 fg.screen_scale = 1
 
