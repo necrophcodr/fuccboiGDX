@@ -1,8 +1,8 @@
 local Tilemap = {}
 Tilemap.__index = Tilemap
 
-local utils = require (fuccboi_path .. '/libraries/fuccboi/utils')
 local Vector = require (fuccboi_path .. '/libraries/hump/vector')
+local fn = require (fuccboi_path .. '/libraries/moses/moses')
 
 function Tilemap.new(x, y, tile_width, tile_height, tilesets, tile_grid, settings)
     local self = {}
@@ -23,7 +23,7 @@ function Tilemap.new(x, y, tile_width, tile_height, tilesets, tile_grid, setting
     self.tile_height = tile_height
 
     -- A single or multiple tilesets
-    if type(tilesets) == 'Image' then self.tilesets = {tilesets}
+    if type(tilesets) == 'userdata' then self.tilesets = {tilesets}
     else self.tilesets = tilesets end
 
     -- 2D array containing tile data for the map, each element = a tile number
@@ -198,12 +198,12 @@ function Tilemap:autoTile(auto_tile_rules, extended_rules)
     -- Basic auto tiling pass using auto_tile_rules
 
     local getAutoTileValue = function(x, y)
-        local h, w = #self.grid, #self.grid[1]
+        local h, w = #self.tile_grid, #self.tile_grid[1]
         local left, right, up, down = nil, nil, nil, nil
-        if x-1 >= 1 then left = self.grid[y][x-1] end 
-        if x+1 <= w then right = self.grid[y][x+1] end
-        if y-1 >= 1 then up = self.grid[y-1][x] end
-        if y+1 <= h then down = self.grid[y+1][x] end
+        if x-1 >= 1 then left = self.tile_grid[y][x-1] end 
+        if x+1 <= w then right = self.tile_grid[y][x+1] end
+        if y-1 >= 1 then up = self.tile_grid[y-1][x] end
+        if y+1 <= h then down = self.tile_grid[y+1][x] end
         local value = 0
         if left and left ~= 0 then value = value + 8 end
         if right and right ~= 0 then value = value + 2 end
@@ -214,10 +214,10 @@ function Tilemap:autoTile(auto_tile_rules, extended_rules)
      
     -- Set bitmask values grid
     local auto_tile_grid = {}
-    for i = 1, #self.grid do
+    for i = 1, #self.tile_grid do
         auto_tile_grid[i] = {}
-        for j = 1, #self.grid[i] do
-            if self.grid[i][j] ~= 0 then
+        for j = 1, #self.tile_grid[i] do
+            if self.tile_grid[i][j] ~= 0 then
                 auto_tile_grid[i][j] = getAutoTileValue(j, i)
             end
         end
@@ -228,12 +228,12 @@ function Tilemap:autoTile(auto_tile_rules, extended_rules)
         for i, v in ipairs(self.auto_tile_rules) do
             if v == value then table.insert(results, i) end
         end
-        return results[math.random(1, #results)] or 1
+        return results[math.random(1, #results)] or 0
     end
 
     -- Set grid values based on auto tiles rules and the temporary bitmask values grid
-    for i = 1, #self.grid do
-        for j = 1, #self.grid[i] do
+    for i = 1, #self.tile_grid do
+        for j = 1, #self.tile_grid[i] do
             local n = findTileValueFromAutoTileRules(auto_tile_grid[i][j])
             self:changeTile(i, j, n)
         end
@@ -241,24 +241,24 @@ function Tilemap:autoTile(auto_tile_rules, extended_rules)
 
     -- Advanced auto tiling pass using extended_rules
 
-    for i = 1, #self.grid do
-        for j = 1, #self.grid[i] do
+    for i = 1, #self.tile_grid do
+        for j = 1, #self.tile_grid[i] do
             for _, rule in ipairs(self.extended_rules) do
                 if auto_tile_grid[i][j] == rule.bit_value then
                     -- Get information about this tile and its neighborhood
-                    local h, w = #self.grid, #self.grid[1]
+                    local h, w = #self.tile_grid, #self.tile_grid[1]
                     local left, right, up, down = nil, nil, nil, nil
-                    if j-1 >= 1 then left = self.grid[i][j-1] end
-                    if j+1 <= w then right = self.grid[i][j+1] end
-                    if i-1 >= 1 then up = self.grid[i-1][j] end
-                    if i+1 <= h then down = self.grid[i+1][j] end
+                    if j-1 >= 1 then left = self.tile_grid[i][j-1] end
+                    if j+1 <= w then right = self.tile_grid[i][j+1] end
+                    if i-1 >= 1 then up = self.tile_grid[i-1][j] end
+                    if i+1 <= h then down = self.tile_grid[i+1][j] end
 
                     -- Check if this tile satisfies the current extended rule
                     local satisfies = {}
-                    if utils.logic.equalsAny(left, rule.left or {}) then satisfies.left = true end
-                    if utils.logic.equalsAny(right, rule.right or {}) then satisfies.right = true end
-                    if utils.logic.equalsAny(up, rule.up or {}) then satisfies.up = true end
-                    if utils.logic.equalsAny(down, rule.down or {}) then satisfies.down = true end
+                    if fn.any(rule.left or {}, left) then satisfies.left = true end
+                    if fn.any(rule.right or {}, right) then satisfies.right = true end
+                    if fn.any(rule.up or {}, up) then satisfies.up = true end
+                    if fn.any(rule.down or {}, down) then satisfies.down = true end
                     local rules = {left = rule.left, right = rule.right, up = rule.up, down = rule.down}
                     local satisfied = true
                     for direction, rule_value in pairs(rules) do
