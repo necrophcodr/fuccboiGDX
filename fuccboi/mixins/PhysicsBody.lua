@@ -19,7 +19,7 @@ function PhysicsBody:addBody(area, x, y, settings)
     if self.bodies[name] then self:removeBody(name) end
 
     -- Define body
-    local body = love.physics.newBody(area.world.world, x, y, settings.body_type or 'dynamic')
+    local body = love.physics.newBody(area.world.box2d_world, x, y, settings.body_type or 'dynamic')
     body:setFixedRotation(true)
 
     -- Define shape
