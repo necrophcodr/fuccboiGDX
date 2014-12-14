@@ -33,7 +33,7 @@ function Input.new()
     self.functions = {}
 
     -- Gamepads... currently only supports 1 gamepad, adding support for more is not that hard, just lazy.
-    self.joystick = love.joystick.getJoysticks()
+    self.joysticks = love.joystick.getJoysticks()
 
     return setmetatable(self, Input)
 end
