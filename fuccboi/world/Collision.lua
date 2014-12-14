@@ -59,7 +59,7 @@ function Collision:isSensor(type1, type2)
             end
         end
     end
-    if self.fg.fn.find(ignored_types, type2) then return true else return false end
+    if self.fg.fn.contains(ignored_types, type2) then return true else return false end
 end
 
 function Collision:collIsSensor(type1, type2)
