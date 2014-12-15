@@ -54,8 +54,8 @@ function Camera.new(settings)
     self.last_target_position = nil
     self.debug_draw = false
     self.scroll_target = {x = self.x, y = self.y}
-    self.game_width = love.graphics.getWidth()
-    self.game_height = love.graphics.getHeight()
+    self.screen_width = love.graphics.getWidth()
+    self.screen_height = love.graphics.getHeight()
     
     return setmetatable(self, Camera)
 end
@@ -155,8 +155,8 @@ end
 function Camera:setGameSize()
     local left, top = self:getWorldCoords(0, 0)
     local right, bottom = self:getWorldCoords(love.graphics.getWidth(), love.graphics.getHeight())
-    self.game_width = right - left
-    self.game_height = bottom - top
+    self.screen_width = right - left
+    self.screen_height = bottom - top
 end
 
 function Camera:setDeadzone(left, top, right, down)
@@ -180,16 +180,16 @@ function Camera:follow(target, settings)
         h = self.target.h or 16
         self.deadzone = {x = -w/2, y = -h/2, width = w, height = h}
     elseif self.follow_style == 'screen' then
-        self.deadzone = {x = -self.game_width/2, y = -self.game_height/2, width = self.game_width, height = self.game_height}
+        self.deadzone = {x = -self.screen_width/2, y = -self.screen_height/2, width = self.screen_width, height = self.screen_height}
     elseif self.follow_style == 'platformer' then
-        w = self.game_width/8
-        h = self.game_height/3
+        w = self.screen_width/8
+        h = self.screen_height/3
         self.deadzone = {x = -w/2, y = -h/2 - h/4, width = w, height = h}
     elseif self.follow_style == 'topdown' then
-        helper = math.max(self.game_width, self.game_height)/4 
+        helper = math.max(self.screen_width, self.screen_height)/4 
         self.deadzone = {x = -helper/2, y = -helper/2, width = helper, height = helper}
     elseif self.follow_style == 'topdown-tight' then
-        helper = math.max(self.game_width, self.game_height)/8 
+        helper = math.max(self.screen_width, self.screen_height)/8 
         self.deadzone = {x = -helper/2, y = -helper/2, width = helper, height = helper}
     end
 end
@@ -239,14 +239,14 @@ function Camera:update(dt)
     self:setGameSize()
     if self.target then self:updateFollow(dt) end
     if self.bounds then
-        local left, top = self.x - self.game_width/2, self.y - self.game_height/2
-        local right, down = self.x + self.game_width/2, self.y + self.game_height/2
+        local left, top = self.x - self.screen_width/2, self.y - self.screen_height/2
+        local right, down = self.x + self.screen_width/2, self.y + self.screen_height/2
         left = utils.math.clamp(left, self.bounds.left, self.bounds.right)
         right = utils.math.clamp(right, self.bounds.left, self.bounds.right)
         top = utils.math.clamp(top, self.bounds.top, self.bounds.down)
         down = utils.math.clamp(down, self.bounds.top, self.bounds.down)
-        self.x = utils.math.clamp(self.x, left + self.game_width/2, right - self.game_width/2)
-        self.y = utils.math.clamp(self.y, top + self.game_height/2, down - self.game_height/2)
+        self.x = utils.math.clamp(self.x, left + self.screen_width/2, right - self.screen_width/2)
+        self.y = utils.math.clamp(self.y, top + self.screen_height/2, down - self.screen_height/2)
     end
     self:updateShake(dt)
 end
@@ -276,18 +276,18 @@ function Camera:debugDraw()
             love.graphics.setColor(255, 255, 255)
         end
         if self.deadzone then
-            local left, top = self.deadzone.x, self.deadzone.y
-            local right, bottom = self.deadzone.width, self.deadzone.height
+            local left, top = fg.screen_scale*self.deadzone.x, fg.screen_scale*self.deadzone.y
+            local right, bottom = fg.screen_scale*self.deadzone.width, fg.screen_scale*self.deadzone.height
             self:attach()
             love.graphics.setLineWidth(3)
             love.graphics.setColor(0, 0, 0)
-            love.graphics.rectangle('line', self.x + left, self.y + top, right, bottom)
+            love.graphics.rectangle('line', self.x - 3*left, self.y, right, bottom)
             love.graphics.setLineWidth(1.5)
             love.graphics.setColor(255, 255, 255)
-            love.graphics.rectangle('line', self.x + left, self.y + top, right, bottom)
-            love.graphics.print('Style: ' .. tostring(self.follow_style), self.x + 40, self.y)
-            love.graphics.print('lerp: ' .. tostring(self.lerp), self.x + 40, self.y + 15)
-            love.graphics.print('lead: ' .. tostring(self.lead.x), self.x + 40, self.y + 30)
+            love.graphics.rectangle('line', self.x - 3*left, self.y, right, bottom)
+            love.graphics.print('style: ' .. tostring(self.follow_style), self.x + 70 - 4*left, self.y)
+            love.graphics.print('lerp: ' .. tostring(self.lerp), self.x + 70 - 4*left, self.y + 15)
+            love.graphics.print('lead: ' .. tostring(self.lead.x), self.x + 70 - 4*left, self.y + 30)
             self:detach()
         end
         love.graphics.setLineWidth(1)
@@ -300,14 +300,16 @@ function Camera:getCameraCoords(x, y)
 	local c, s = cos(self.rotation), sin(self.rotation)
 	x, y = x - self.x, y - self.y
 	x, y = c*x - s*y, s*x + c*y
-	return x*self.scale + w/2, y*self.scale + h/2
+	-- return x*self.scale + w/2, y*self.scale + h/2
+	return x*fg.screen_scale + w/2, y*fg.screen_scale + h/2
 end
 
 function Camera:getWorldCoords(x, y)
 	-- x,y = (((x,y) - center) / self.scale):rotated(-self.rot) + (self.x,self.y)
 	local w, h = love.graphics.getWidth(), love.graphics.getHeight()
 	local c, s = cos(-self.rotation), sin(-self.rotation)
-	x, y = (x - w/2)/self.scale, (y - h/2)/self.scale
+	-- x, y = (x - w/2)/self.scale, (y - h/2)/self.scale
+	x, y = (x - w/2)/fg.screen_scale, (y - h/2)/fg.screen_scale
 	x, y = c*x - s*y, s*x + c*y
 	return x+self.x, y+self.y
 end
