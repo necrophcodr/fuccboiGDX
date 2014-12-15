@@ -131,7 +131,9 @@ function Layer:draw()
         self.main_canvas:renderTo(function()
             self.world:renderAttach()
             for _, entity in ipairs(self.entities) do 
-                if entity.area.active then entity:draw() end
+                if entity.area then
+                    if entity.area.active then entity:draw() end
+                else entity:draw() end
             end
             self.world:renderDetach()
         end)
