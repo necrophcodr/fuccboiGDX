@@ -170,8 +170,8 @@ function Camera:follow(target, settings)
     self.target = target 
     local settings = settings or {}
     self.follow_style = settings.follow_style or self.follow_style
-    self.follow_lead = settings.lead or self.follow_lead
-    self.follow_lerp = settings.lerp or self.follow_lerp
+    self.lead = settings.lead or self.lead
+    self.lerp = settings.lerp or self.lerp
     local w, h = 0, 0
     local helper = 0
 
@@ -215,16 +215,16 @@ function Camera:updateFollow(dt)
         end
         
         if not self.last_target_position then self.last_target_position = Vector(self.target.x, self.target.y) end
-        self.scroll_target.x = self.scroll_target.x + (self.target.x - self.last_target_position.x)*self.follow_lead.x
-        self.scroll_target.y = self.scroll_target.y + (self.target.y - self.last_target_position.y)*self.follow_lead.y
+        self.scroll_target.x = self.scroll_target.x + (self.target.x - self.last_target_position.x)*self.lead.x
+        self.scroll_target.y = self.scroll_target.y + (self.target.y - self.last_target_position.y)*self.lead.y
         self.last_target_position.x = self.target.x
         self.last_target_position.y = self.target.y
 
-        if self.follow_lerp == 0 then
+        if self.lerp == 0 then
 
         else
-            self:move((self.scroll_target.x - self.x)*dt/(dt+self.follow_lerp*dt),
-                      (self.scroll_target.y - self.y)*dt/(dt+self.follow_lerp*dt))
+            self:move((self.scroll_target.x - self.x)*dt/(dt+self.lerp*dt),
+                      (self.scroll_target.y - self.y)*dt/(dt+self.lerp*dt))
         end
     end
 end
@@ -286,8 +286,8 @@ function Camera:debugDraw()
             love.graphics.setColor(255, 255, 255)
             love.graphics.rectangle('line', self.x + left, self.y + top, right, bottom)
             love.graphics.print('Style: ' .. tostring(self.follow_style), self.x + 40, self.y)
-            love.graphics.print('lerp: ' .. tostring(self.follow_lerp), self.x + 40, self.y + 15)
-            love.graphics.print('lead: ' .. tostring(self.follow_lead.x), self.x + 40, self.y + 30)
+            love.graphics.print('lerp: ' .. tostring(self.lerp), self.x + 40, self.y + 15)
+            love.graphics.print('lead: ' .. tostring(self.lead.x), self.x + 40, self.y + 30)
             self:detach()
         end
         love.graphics.setLineWidth(1)
