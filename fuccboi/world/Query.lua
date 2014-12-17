@@ -7,13 +7,49 @@ end
 
 function Query:getEntitiesBy(key, value, object_types)
     local entities = {} 
-    for _, type in ipairs(object_types) do
-        for _, group in ipairs(self.groups) do
-            if group.name == type then
-                for _, object in ipairs(group:getEntities()) do
-                    if object[key] == value then
-                        table.insert(entities, object)
+    if object_types then
+        for _, type in ipairs(object_types) do
+            for _, group in ipairs(self.groups) do
+                if group.name == type then
+                    for _, object in ipairs(group:getEntities()) do
+                        if object[key] == value then
+                            table.insert(entities, object)
+                        end
                     end
+                end
+            end
+        end
+    else
+        for _, group in ipairs(self.groups) do
+            for _, object in ipairs(group:getEntities()) do
+                if object[key] == value then
+                    table.insert(entities, object)
+                end
+            end
+        end
+    end
+    return entities
+end
+
+function Query:getEntitiesWhere(condition, object_types)
+    local entities = {}
+    if object_types then
+        for _, type in ipairs(object_types) do
+            for _, group in ipairs(self.groups) do
+                if group.name == type then
+                    for _, object in ipairs(group:getEntities()) do
+                        if condition(object) then
+                            table.insert(entities, object)
+                        end
+                    end
+                end
+            end
+        end
+    else
+        for _, group in ipairs(self.groups) do
+            for _, object in ipairs(group:getEntities()) do
+                if condition(object) then
+                    table.insert(entities, object)
                 end
             end
         end
